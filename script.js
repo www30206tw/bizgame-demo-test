@@ -758,7 +758,6 @@ function recalcRevenueFromScratch(){
     }
     // 河流標籤：蓋在河流時 +3
     if (t.type === 'river') t.buildingProduce += 3;
-    // 荒原標籤的「50% 機率不產出」會在 computeEffectiveRevenue() 階段自動套用
   }
   });
   // 5. 累加
@@ -793,29 +792,6 @@ function showModal(message) {
 document.getElementById('warning-close-btn').onclick = () => {
   document.getElementById('warning-modal').style.display = 'none';
 };
-
-// 輔助：計算實際入帳（科技加成）
-function computeEffectiveRevenue(){
-  let eff = 0;
-  const wuluDef  = techDefinitions['廢物利用'];
-  const dijiaDef = techDefinitions['地價升值'];
-
-  tileMap.forEach(t => {
-    if (!t.buildingPlaced) return;
-    // 1. 基础产出
-    let v = t.buildingProduce;
-    // 2. 科技加成
-    if (wuluDef && t.type === 'wasteland') {
-      v += wuluDef.perLevel * wuluDef.count;
-    }
-    if (dijiaDef && t.type === 'city') {
-      v += dijiaDef.perLevel * dijiaDef.count;
-    }
-    eff += v;
-  });
-
-  return eff;
-}
 
 // 啟動 Draw
 function startDrawPhase(){
@@ -900,8 +876,8 @@ window.onload = () => {
   document.getElementById('tech-button').onclick    = showTechModal;
   document.getElementById('close-tech-btn').onclick = hideTechModal;
   endTurnBtn.onclick = () => {
-  // 1. 計算本回合實際入帳並累加
-  currentGold += computeEffectiveRevenue();
+  // 1. 直接把「回合收益」加給玩家
+  currentGold += roundRevenue;
   updateResourceDisplay();
   // 2. 更新 UI（金幣 & 回合收益）
   if (paymentSchedule[currentRound]) {
@@ -923,7 +899,7 @@ window.onload = () => {
       showModal('成功支付金幣!');
       // 第16回合支付後即勝利
       if (currentRound === 16) {
-        showEndScreen('遊戲勝利!!');
+        showEndScreen('勝利!!');
         return;
       }
     }
