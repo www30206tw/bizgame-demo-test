@@ -31,7 +31,7 @@ const cardPoolData = [
   { name:'廢材棚', rarity:'普通', label:'荒原',   baseProduce:4 ,type:'building' },
   { name:'社群站', rarity:'普通', label:'貧民窟', baseProduce:4, specialAbility:'當有任何建築相臨時，產出額外+1' ,type:'building' },
   { name:'彈出商亭', rarity:'普通', label:'繁華區', baseProduce:5, specialAbility:'當位於任何邊緣地塊時，產出額外+1' ,type:'building' },
-  { name:'地脈節點', rarity:'普通', label:'荒原', baseProduce:6, specialAbility:'當剛好有兩個建築相臨時，產出額外+1' ,type:'building' },
+  { name:'地脈節點', rarity:'普通', label:'荒原', baseProduce:6, specialAbility:'當恰好有兩個建築相臨時，包含此建築的，合計三座建築產出額外+1' ,type:'building' },
   { name:'匯聚平臺', rarity:'稀有', label:'貧民窟', baseProduce:5, specialAbility:'當相鄰的建築超過2個時，產出額外+2' ,type:'building' },
   { name:'流動站',   rarity:'稀有', label:'河流',   baseProduce:5, specialAbility:'若相鄰的建築位於河流地塊上，該建築產出額外+1' ,type:'building' },
   { name:'焚料方艙', rarity:'稀有', label:'荒原',   baseProduce:8, specialAbility:'若本回合為偶數回合，產出永久−1，最多永久減少4' ,type:'building' },
