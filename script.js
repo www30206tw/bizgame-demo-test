@@ -23,7 +23,7 @@ const typeMapping = {
 };
 
 const cardPoolData = [
-  { name:'淨水站', rarity:'普通', label:'河流',     baseProduce:4, specialAbility:'回合結束時，有50%機率產出額外+1' ,type:'building' },
+  { name:'淨水站', rarity:'普通', label:'河流',     baseProduce:4, specialAbility:'若相鄰地塊有河流地塊，則產出 +1' ,type:'building' },
   { name:'星軌會館', rarity:'稀有', label:'繁華區',  baseProduce:6, specialAbility:'沒有任何建築相臨時，產出額外+2' ,type:'building' },
   { name:'摩天坊', rarity:'普通', label:'繁華區', baseProduce:5 ,type:'building' },
   { name:'集貧居', rarity:'普通', label:'貧民窟', baseProduce:4 ,type:'building' },
@@ -53,7 +53,7 @@ const labelEffectDesc = {
   "繁華區":"蓋在繁華區時+4",
   "貧民窟":"相鄰貧民窟建築每座+1",
   "河流":"蓋在河流時+3",
-  "荒原":"非荒原地塊50%機率不產出"
+  "荒原":"非荒原地塊產出 -2"
 };
 
 // 在 labelEffectDesc 之後，加入
@@ -631,6 +631,10 @@ function recalcRevenueFromScratch(){
       pv-=1;
       if(t.buildingLabel==='河流') pv+=3;
     }
+    // 新增：荒原標籤效果（非荒原地塊 −2）
+   if (t.buildingLabel === '荒原' && t.type !== 'wasteland') {
+     pv -= 2;
+   }
     t.buildingProduce = pv;
   });
   // 2. slum BFS 群聚 +1
@@ -663,7 +667,14 @@ function recalcRevenueFromScratch(){
   // 4. specialAbility on water & star
   tileMap.forEach(t=>{
     if(!t.buildingPlaced) return;
-    if(t.buildingName==='淨水站'&&Math.random()<0.5) t.buildingProduce++;
+    // 新：若「淨水站」旁邊有河流地塊，則產出 +1
+    if (t.buildingName === '淨水站') {
+       const hasRiverNeighbor = t.adjacency.some(id => {
+        const nt = tileMap.find(x => x.id === id);
+        return nt && nt.type === 'river';
+      });
+      if (hasRiverNeighbor) t.buildingProduce++;
+   }
     if(t.buildingName==='星軌會館'){
        const hasN = t.adjacency.some(id=>{
         const nt=tileMap.find(x=>x.id===id);
@@ -783,7 +794,7 @@ document.getElementById('warning-close-btn').onclick = () => {
   document.getElementById('warning-modal').style.display = 'none';
 };
 
-// 輔助：計算實際入帳（含荒原50%機率不產出 & 科技加成）
+// 輔助：計算實際入帳（科技加成）
 function computeEffectiveRevenue(){
   let eff = 0;
   const wuluDef  = techDefinitions['廢物利用'];
@@ -800,10 +811,6 @@ function computeEffectiveRevenue(){
     if (dijiaDef && t.type === 'city') {
       v += dijiaDef.perLevel * dijiaDef.count;
     }
-    // 3. 荒原标签效果：若建筑标签是「荒原」且放在非荒原地块，则50%机率不产出
-     if (t.buildingLabel === '荒原' && t.type !== 'wasteland' && Math.random() < 0.5) {
-       v = 0;
-     }
     eff += v;
   });
 
