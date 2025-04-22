@@ -82,7 +82,7 @@ const tileTypeNames = {
 };
 
 // ——— 支付節點設定 ———
-const paymentSchedule = { 5:180, 10:640, 16:1450 };
+const paymentSchedule = { 5:180, 10:640, 16:1450 ,22:2400};
 
 let tileMap = [];
 
@@ -136,7 +136,8 @@ function shuffle(arr) {
 function getRarityDistribution(round) {
   if (round <= 5)   return { 普通: 1.0, 稀有: 0.0 };
   if (round <= 10)  return { 普通: 0.85, 稀有: 0.15 };
-                     return { 普通: 0.75, 稀有: 0.25 };
+  if (round <= 16)  return { 普通: 0.75, 稀有: 0.25 };
+  if (round <= 22)  return { 普通: 0.6, 稀有: 0.4 };
 }
 
 //從一個 {key: weight, …} 物件隨機選一個 key。
@@ -887,7 +888,8 @@ window.onload = () => {
       let msg = '';
       if (currentRound === 5)      msg = '至少也要付一點錢吧●–●!';
       else if (currentRound === 10) msg = '下一把會更好>_<';
-      else if (currentRound === 16) msg = '就差一點了，再努力一下 O口O';
+      else if (currentRound === 16) msg = '下一把會更好>_<';
+      else if (currentRound === 22) msg = '就差一點了，再努力一下 O口O';
       else                          msg = '遊戲結束';
       showEndScreen(msg);
       return;
@@ -898,7 +900,7 @@ window.onload = () => {
 
       showModal('成功支付金幣!');
       // 第16回合支付後即勝利
-      if (currentRound === 16) {
+      if (currentRound === 22) {
         showEndScreen('勝利!!');
         return;
       }
