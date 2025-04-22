@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Game Demo - Card Pool with Labels</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- 遊戲開始畫面，另加一個按鈕方便測試 -->
+    <div id="start-screen" class="start-screen">
+      <h1>遊戲 DEMO</h1>
+      <p>按下 Enter 或點擊下方按鈕開始遊戲</p>
+      <p>請堅持到支付3次金幣</p>
+      <button id="startBtn" type="button">開始遊戲</button>
+    </div>
+
+    <!-- 頂部資訊 -->
+    <div class="top-bar">
+      <div class="gold-info">
+        金幣：<span id="gold-amount">0</span><br />
+        回合收益：<span id="round-gold">0</span>
+      </div>
+      <div class="center-info">
+        <div class="round-info">回合數：<span id="round-number">1</span></div><br />
+        <div class="stage-bar" id="stage-bar">時間軸</div>
+      </div>
+    </div>
+
+    <!-- 抽卡區塊 (5 張卡牌，選 2) -->
+    <div id="draw-section">
+      <div class="draw-box">
+        <h2>抽卡階段：請從以下卡片中選擇 2 張</h2>
+        <div class="card-pool" id="card-pool"></div>
+        <div class="draw-buttons">
+          <button id="refresh-btn" onclick="refreshCards()">刷新卡片(2 金幣)</button>
+          <button onclick="skipDraw()">跳過本輪抽卡（+10 金幣）</button>
+          <button onclick="confirmDraw()">確定選卡</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 中間區域 (地塊 + 側邊欄) -->
+    <div class="middle-section">
+      <!-- 左側：科技樹按鈕 -->
+      <div class="sidebar">
+        <button id="tech-button">科技樹</button>
+      </div>
+
+      <!-- 中間：地塊區 -->
+      <div class="map-area" id="map-area"></div>
+
+      <!-- 右側：撤銷按鈕 + 懸浮窗容器 -->
+      <div class="sidebar">
+        <button id="undo-btn" disabled>復原</button>
+        <div id="hcover" class="hcover"></div>
+      </div>
+    </div>
+
+    <!-- 科技樹 Modal -->
+    <div id="tech-modal" class="warning-modal" style="display:none; z-index:1003;">
+      <div class="warning-content">
+        <h2>科技樹</h2>
+        <ul id="tech-list"></ul>
+        <button id="close-tech-btn">關閉</button>
+      </div>
+    </div>
+
+    <!-- 底部 (手排 & 回合結束) -->
+    <div class="bottom-bar">
+      <div class="hand-cards" id="hand">手牌（建築）</div>
+      <button class="btn-end" id="end-turn-btn">回合結束</button>
+    </div>
+
+    <script src="script.js" defer></script>
+
+     <!-- 全螢幕提示彈窗 -->
+  <div id="warning-modal" class="warning-modal">
+    <div class="warning-content">
+      <p id="warning-text"></p>
+      <button id="warning-close-btn">確定</button>
+    </div>
+  </div>
+
+    <!-- 遊戲結束畫面 -->
+  <div id="end-screen" class="start-screen" style="display:none;">
+    <h1 id="end-title"></h1>
+    <button id="restartBtn" type="button">重新開始遊戲</button>
+  </div>
+
+  </body>
+</html>

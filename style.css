@@ -1,0 +1,276 @@
+/* 全域預設 */
+body {
+  margin: 0;
+  font-family: sans-serif;
+}
+
+/* 頂部與底部 */
+.top-bar, .bottom-bar {
+  background: pink;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* 中間區域 */
+.middle-section {
+  display: flex;
+  background: #74b9ff;
+  height: 480px;
+}
+
+.map-area {
+  flex: 1;
+  position: relative;
+  margin: 20px;
+  border: 1px solid #aaa;
+}
+
+.sidebar {
+  width: 80px;              /* 根据按钮文字长度稍微加宽 */
+  background: #ddd;
+  display: flex;
+  flex-direction: column;   /* 改为竖直排列 */
+  justify-content: center;
+  align-items: center;
+  gap: 10px;  
+}
+
+.hand-cards {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* 抽卡視窗 */
+.draw-box {
+  background: beige;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  margin: auto;
+}
+#draw-section {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10,10,10,0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+.card-pool {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+/* 卡片樣式 */
+.card {
+  width: 140px;        /* 增加卡牌寬度 */
+  height: 260px;       /* 增加卡牌高度 */
+  border: 1px solid #333;
+  background: #eee;
+  position: relative;
+  cursor: pointer;
+  padding: 5px;
+  box-sizing: border-box;
+}
+
+.card.selected {
+  outline: 4px dashed #ff0;     /* 黃色虛線邊框 */
+  box-shadow: 0 0 10px rgba(255,255,0,0.8); /* 黃色光暈 */
+  transition: outline 0.2s, box-shadow 0.2s;
+}
+
+/* 調整內部文字排版，讓 card-name、card-rarity、card-label 與 card-ability 不重疊 */
+.card .card-image-area {
+  position: absolute;
+  top: 30px;
+  left: 10px;
+  width: 120px;
+  height: 60px;
+  background-color: #ccc;
+}
+.card .card-name {
+  position: absolute;
+  top: 95px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
+}
+.card .card-rarity {
+  position: absolute;
+  top: 120px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-size: 14px;
+  color: #444;
+}
+.card .card-label {
+  position: absolute;
+  top: 145px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
+  font-size: 14px;
+  color: #222;
+}
+.card .card-ability {
+  position: absolute;
+  top: 170px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-size: 13px;
+  color: #006600;
+}
+.card .tooltip {
+  position: absolute;
+  top: 10px;
+  left: 150px;
+  width: 180px;
+  background: #fff;
+  color: #333;
+  border: 1px solid #aaa;
+  padding: 5px;
+  display: none;
+  z-index: 99;
+}
+.card:hover .tooltip {
+  display: block;
+}
+
+/* 六邊形地塊 */
+.hex-tile {
+  width: 80px;
+  height: 80px;
+  clip-path: polygon(
+    50% 0%,
+    93% 25%,
+    93% 75%,
+    50% 100%,
+    7% 75%,
+    7% 25%
+  );
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  color: #fff;
+  position: absolute;
+}
+.city-tile {
+  background-color: #8e44ad;
+}
+.slum-tile {
+  background-color: #2c2c2c;
+}
+.river-tile {
+  background-color: #2980b9;
+}
+.wasteland-tile {
+  background-color: #d4ac0d;
+}
+
+/* 遊戲開始畫面 */
+.start-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.8);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.start-screen h1 {
+  font-size: 3em;
+  margin-bottom: 20px;
+}
+.start-screen p {
+  font-size: 1.5em;
+}
+#startBtn {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+ .hcover {
+   position: absolute;
+   display: none;
+   background: #fff;
+   border: 1px solid #aaa;
+   padding: 8px;
+   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+   z-index: 1000;
+   pointer-events: none; /* 不攔截滑鼠 */
+ }
+
+.warning-modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.8);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1002;
+}
+.warning-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+/* 撤銷按鈕 */
+#undo-btn {
+  margin-right: 10px;
+  padding: 8px 12px;
+  background: #eee;
+  border: 1px solid #333;
+  border-radius: 4px;
+  cursor: pointer;
+}
+#undo-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 科技樹 Modal 版型 */
+#tech-modal .warning-content {
+  width: 500px;
+}
+#tech-list {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0;
+}
+#tech-list li {
+  margin-bottom: 5px;
+}
+
+/* 卡牌底部的類型標示 */
+.card .card-type {
+  position: absolute;
+  bottom: 5px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+}
