@@ -842,16 +842,24 @@ window.onload = () => {
   const showDrawBtn = document.getElementById('show-draw-btn');
  
   // 隱藏抽卡介面，回到主畫面
-  hideDrawBtn.onclick = () => {
-    document.getElementById('draw-section').style.display = 'none';
-    showDrawBtn.style.display = 'block';
-  };
+  hideDrawBtn.addEventListener('click', function(e) {
+     e.preventDefault();
+     e.stopPropagation();
+     const drawSec = document.getElementById('draw-section');
+     drawSec.style.display = 'none';
+     showDrawBtn.style.display = 'block';
+     console.log('hide-draw-btn clicked, draw-section hidden');
+   });
  
   // 再次開啟抽卡介面
-  showDrawBtn.onclick = () => {
-    document.getElementById('draw-section').style.display = 'flex';
-    showDrawBtn.style.display = 'none';
-  };
+  showDrawBtn.addEventListener('click', function(e) {
+     e.preventDefault();
+     e.stopPropagation();
+     const drawSec = document.getElementById('draw-section');
+     drawSec.style.display = 'flex';
+     showDrawBtn.style.display = 'none';
+     console.log('show-draw-btn clicked, draw-section shown');
+   });
   
   undoBtn.disabled = true;  // 初始關閉
   undoBtn.onclick = () => {
