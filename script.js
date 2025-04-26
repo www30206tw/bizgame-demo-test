@@ -82,7 +82,7 @@ const tileTypeNames = {
 };
 
 // ——— 支付節點設定 ———
-const paymentSchedule = { 5:180, 10:640, 16:1450 ,22:2400};
+const paymentSchedule = { 5:180, 10:640, 16:1250 ,22:2000};
 
 let tileMap = [];
 
