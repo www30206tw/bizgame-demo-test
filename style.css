@@ -274,3 +274,17 @@ body {
   font-weight: bold;
   color: #333;
 }
+
+/* 新增：顯示抽卡介面按鈕 */
+#show-draw-btn {
+  display: none;               /* 先隱藏 */
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 8px 12px;
+  background: #fff;
+  border: 1px solid #333;
+  border-radius: 4px;
+  cursor: pointer;
+  z-index: 1001;               /* 要高於地圖但低於 draw-section (999) */
+}
