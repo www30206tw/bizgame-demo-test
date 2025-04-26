@@ -36,9 +36,14 @@
           <button id="refresh-btn" onclick="refreshCards()">刷新卡片(2 金幣)</button>
           <button onclick="skipDraw()">跳過本輪抽卡（+10 金幣）</button>
           <button onclick="confirmDraw()">確定選卡</button>
+          <!-- 新增：隱藏抽卡介面 -->
+          <button id="hide-draw-btn" type="button">隱藏</button>
         </div>
       </div>
     </div>
+
+    <!-- 新增：顯示抽卡介面按鈕（預設隱藏） -->
+    <button id="show-draw-btn" type="button">顯示</button>
 
     <!-- 中間區域 (地塊 + 側邊欄) -->
     <div class="middle-section">
