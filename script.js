@@ -799,6 +799,7 @@ function startDrawPhase(){
   refreshCount = 0;
   updateRefreshButton();
   document.getElementById('draw-section').style.display='flex';
+  document.getElementById('show-draw-btn').style.display = 'none';
   drawCards();
   updateStageBar();
 }
@@ -836,6 +837,22 @@ window.onload = () => {
   const startBtn    = document.getElementById('startBtn');
   const endTurnBtn  = document.getElementById('end-turn-btn');
   const undoBtn = document.getElementById('undo-btn');
+  // 取得「隱藏」與「顯示」按鈕
+  const hideDrawBtn = document.getElementById('hide-draw-btn');
+  const showDrawBtn = document.getElementById('show-draw-btn');
+ 
+  // 隱藏抽卡介面，回到主畫面
+  hideDrawBtn.onclick = () => {
+    document.getElementById('draw-section').style.display = 'none';
+    showDrawBtn.style.display = 'block';
+  };
+ 
+  // 再次開啟抽卡介面
+  showDrawBtn.onclick = () => {
+    document.getElementById('draw-section').style.display = 'flex';
+    showDrawBtn.style.display = 'none';
+  };
+  
   undoBtn.disabled = true;  // 初始關閉
   undoBtn.onclick = () => {
   if (!lastPlacement) return;
