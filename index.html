@@ -51,6 +51,27 @@
         <button id="tech-button">科技樹</button>
       </div>
 
+    <!-- 新增：地塊資訊面板（預設展開） -->
+      <div id="tile-info-panel">
+        <div class="tile-info-item">
+          <div class="hex-tile city-tile small"></div>
+          <span>繁華區：所有建築產出 +2</span>
+        </div>
+        <div class="tile-info-item">
+          <div class="hex-tile slum-tile small"></div>
+          <span>貧民窟：若 3 塊（含）以上相連且都有建築，則各額外 +1</span>
+        </div>
+        <div class="tile-info-item">
+          <div class="hex-tile river-tile small"></div>
+          <span>河流：建築產出 −1</span>
+        </div>
+        <div class="tile-info-item">
+          <div class="hex-tile wasteland-tile small"></div>
+          <span>荒原：無效果</span>
+        </div>
+        <button id="toggle-tile-info">收起</button>
+      </div>
+
       <!-- 中間：地塊區 -->
       <div class="map-area" id="map-area"></div>
 
