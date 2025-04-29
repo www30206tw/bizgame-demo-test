@@ -288,3 +288,43 @@ body {
   cursor: pointer;
   z-index: 1001;               /* 要高於地圖但低於 draw-section (999) */
 }
+
+/* 地塊資訊面板 */
+#tile-info-panel {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: rgba(255,255,255,0.9);
+  padding: 8px;
+  border-radius: 6px;
+  z-index: 1002;
+}
+.tile-info-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.tile-info-item .small {
+  width: 20px;
+  height: 20px;
+  margin-right: 6px;
+}
+#toggle-tile-info {
+  display: block;
+  margin-top: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* 當面板隱藏時，只留展開按鈕 */
+#expand-tile-info {
+  display: none;
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  z-index: 1002;
+}
