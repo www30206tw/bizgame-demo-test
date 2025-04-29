@@ -277,20 +277,7 @@ function initMapArea(){
   const tileData = tileMap.find(t => String(t.id) === hex.dataset.tileId);
   const rect = hex.getBoundingClientRect();
 
-  if (!tileData.buildingPlaced) {
-    // —— 空地：中英地塊名稱 —— 
-    const popup = document.createElement('div');
-    popup.className = 'hcover hcover-popup';
-    popup.innerHTML =
-    `地塊類型：${tileData.type}（${tileTypeNames[tileData.type]}）<br>` +
-    `地塊效果：${tileEffectDesc[tileData.type]}`;
-    popup.style.top  = `${rect.top}px`;
-    popup.style.left = `${rect.right + 5}px`;
-    popup.style.display = 'block';
-    document.body.appendChild(popup);
-
-    } 
-  else {
+  if {
     // —— 已放建築：三個懸浮框 —— 
 
     // 1. 完整卡牌
