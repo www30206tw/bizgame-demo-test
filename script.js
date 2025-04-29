@@ -860,6 +860,23 @@ window.onload = () => {
      showDrawBtn.style.display = 'none';
      console.log('show-draw-btn clicked, draw-section shown');
    });
+
+  // 地塊資訊收合控制
+  const panel = document.getElementById('tile-info-panel');
+  // 在 index.html 最底下新增展開按鈕
+  const expandBtn = document.createElement('button');
+  expandBtn.id = 'expand-tile-info';
+  expandBtn.innerText = '展開';
+  document.body.appendChild(expandBtn);
+ 
+  document.getElementById('toggle-tile-info').addEventListener('click', () => {
+    panel.style.display = 'none';
+    expandBtn.style.display = 'block';
+  });
+  expandBtn.addEventListener('click', () => {
+    panel.style.display = 'block';
+    expandBtn.style.display = 'none';
+  });
   
   undoBtn.disabled = true;  // 初始關閉
   undoBtn.onclick = () => {
