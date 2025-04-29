@@ -867,7 +867,7 @@ window.onload = () => {
   const expandBtn = document.createElement('button');
   expandBtn.id = 'expand-tile-info';
   expandBtn.innerText = '展開';
-  document.body.appendChild(expandBtn);
+  document.querySelector('.middle-section').appendChild(expandBtn);
  
   document.getElementById('toggle-tile-info').addEventListener('click', () => {
     panel.style.display = 'none';
