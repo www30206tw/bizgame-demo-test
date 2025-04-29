@@ -275,9 +275,9 @@ function initMapArea(){
       document.querySelectorAll('.hcover-popup').forEach(el => el.remove());
 
   const tileData = tileMap.find(t => String(t.id) === hex.dataset.tileId);
-  const rect = hex.getBoundingClientRect();
 
-    if (!tileData.buildingPlaced) return; const rect = hex.getBoundingClientRect();
+    if (!tileData.buildingPlaced) return; 
+    const rect = hex.getBoundingClientRect();
     else {
     // —— 已放建築：三個懸浮框 —— 
 
