@@ -322,8 +322,8 @@ body {
 #expand-tile-info {
   display: none;
   position: absolute;
-  top: 20px;
-  left: 20px;
+  top: 30px;
+  left: 100px;
   padding: 4px 8px;
   font-size: 12px;
   cursor: pointer;
