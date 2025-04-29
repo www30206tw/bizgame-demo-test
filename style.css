@@ -328,7 +328,8 @@ body {
 #expand-tile-info {
   display: none;
   position: absolute;
-  top: 30px;
+  /* 面板 top:30px + 内部 padding-top:8px */
+  top: calc(30px + 8px);
   left: 100px;
   padding: 4px 8px;
   font-size: 12px;
