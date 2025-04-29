@@ -277,6 +277,7 @@ function initMapArea(){
   const tileData = tileMap.find(t => String(t.id) === hex.dataset.tileId);
   const rect = hex.getBoundingClientRect();
 
+  if {
     // —— 已放建築：三個懸浮框 —— 
 
     // 1. 完整卡牌
@@ -360,6 +361,7 @@ function initMapArea(){
    producePopup.style.top    = `${currentTop}px`;
    producePopup.style.left   = `${offsetX}px`;
    producePopup.style.display= 'block';
+     }
   });
 
     // 滑鼠移出：隱藏懸浮窗
