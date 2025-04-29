@@ -298,7 +298,13 @@ body {
   background: rgba(255,255,255,0.9);
   padding: 8px;
   border-radius: 6px;
-  z-index: 1002;
+  z-index: 500;
+}
+.tile-info-item .hex-tile {
+  /* 让它按照 flex 流式排列，不再 absolute */
+  position: static;
+  /* small 规则已设宽高，这里加点右边距推开文字 */
+  margin-right: 6px;
 }
 .tile-info-item {
   display: flex;
@@ -327,5 +333,5 @@ body {
   padding: 4px 8px;
   font-size: 12px;
   cursor: pointer;
-  z-index: 1002;
+  z-index: 500;
 }
