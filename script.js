@@ -405,12 +405,18 @@ function computePotentialProduce(tileType, label, baseProduce) {
 // 删除所有旧的预览数字
 function clearPreviews() {
   document.querySelectorAll('.preview-label').forEach(el => el.remove());
+  // 恢復所有地塊文字顏色
+  document.querySelectorAll('.hex-tile').forEach(hex => {
+    hex.style.color = '';
+  });
 }
 
 // 显示当前 hoverTileId 下的预览
 function showPreviews(hoverTileId) {
   tileMap.forEach(t => {
     const hex = document.querySelector(`[data-tile-id="${t.id}"]`);
+     // 隱藏原本的「?」
+     hex.style.color = 'transparent';
     // 只有 hover 的那个 tile 计算 diff，其他一律 0
     const diff = (String(t.id) === hoverTileId)
       ? computePotentialProduce(t.type, draggingCardInfo.label, draggingCardInfo.baseProduce)
@@ -500,11 +506,7 @@ function createBuildingCard(info){
   // 拖曳
   card.draggable = true;
   card.addEventListener('dragstart', e => {
-
-  // 结束拖拽：清空状态、恢复不透明、移除预览
-     draggingCardInfo = null;
-     card.classList.remove('dragging');
-     clearPreviews();
+     
   // 记录拖拽中的卡片 info，并加半透明
   draggingCardInfo = { baseProduce: info.baseProduce, label: info.label };
   card.classList.add('dragging');
@@ -537,6 +539,10 @@ function createBuildingCard(info){
 });
 
  card.addEventListener('dragend', e => {
+  // 拖拽結束：清空拖拽狀態、移除預覽、恢復卡片不透明
+   draggingCardInfo = null;
+   clearPreviews();
+   card.classList.remove('dragging');
   // 先把自身 tooltip 還原
   const tip = card.querySelector('.tooltip');
   if (tip) tip.style.display = '';
