@@ -191,6 +191,23 @@ body {
   background-color: #d4ac0d;
 }
 
+/* 拖拽中的卡片半透明 */
+.card.dragging {
+  opacity: 0.5;
+}
+
+/* 预览数字标签 */
+.preview-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 16px;
+  font-weight: bold;
+  pointer-events: none;
+  z-index: 999;
+}
+
 /* 遊戲開始畫面 */
 .start-screen {
   position: fixed;
