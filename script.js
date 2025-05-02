@@ -276,10 +276,14 @@ function initMapArea(){
 
   const tileData = tileMap.find(t => String(t.id) === hex.dataset.tileId);
 
-    if (!tileData.buildingPlaced) return; 
-    const rect = hex.getBoundingClientRect();
-    else {
-    // —— 已放建築：三個懸浮框 —— 
+    // 空地時直接返回，不顯示任何 hcover
+   if (!tileData.buildingPlaced) {
+     return;
+   }
+   // 放了建築才取 rect 並顯示 popup
+   const rect = hex.getBoundingClientRect();
+      
+   // —— 已放建築：三個懸浮框 —— 
 
     // 1. 完整卡牌
     const cardPopup = document.createElement('div');
@@ -362,7 +366,6 @@ function initMapArea(){
    producePopup.style.top    = `${currentTop}px`;
    producePopup.style.left   = `${offsetX}px`;
    producePopup.style.display= 'block';
-     }
   });
 
     // 滑鼠移出：隱藏懸浮窗
