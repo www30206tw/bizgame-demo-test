@@ -50,7 +50,9 @@ body {
   padding: 20px;
   text-align: center;
   margin: auto;
+  position: relative;
 }
+
 #draw-section {
   position: fixed;
   top: 0;
@@ -147,6 +149,14 @@ body {
 }
 .card:hover .tooltip {
   display: block;
+}
+
+/* 調整「隱藏」按鈕位置 */
+#hide-draw-btn {
+  position: absolute;
+  bottom: 16px;   /* 距離 draw-box 底部 */
+  right: 16px;    /* 距離 draw-box 右側 */
+  /* （可再加上想要的 padding / 顏色 等） */
 }
 
 /* 六邊形地塊 */
