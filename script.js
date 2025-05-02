@@ -9,6 +9,7 @@ let roundRevenue = 0;
 let refreshCount = 0;
 let warningNextRoundShown = false;
 let lastPlacement = null;
+let draggingCardInfo = null;
 
 const rows = [4,5,4,5,4,5,4];
 const typeMapping = {
@@ -373,7 +374,53 @@ function initMapArea(){
       document.querySelectorAll('.hcover-popup').forEach(el => el.remove());
     });
 
+    // 拖过地块时，显示对应预览
+    hex.addEventListener('dragover', e => {
+      if (!draggingCardInfo) return;
+      e.preventDefault();           // 允许 drop
+       clearPreviews();
+       showPreviews(hex.dataset.tileId);
+      });
+
      mapArea.appendChild(hex);
+  });
+}
+
+// 计算：把这张卡放到 type 为 tileType 的地块上，最终的产出值
+function computePotentialProduce(tileType, label, baseProduce) {
+  let pv = baseProduce;
+  if (tileType === 'city') {
+    pv += 2;
+    if (label === '繁華區') pv += 4;
+  } else if (tileType === 'river') {
+    pv -= 1;
+    if (label === '河流') pv += 3;
+  }
+  // 荒原标签对非荒原地块的惩罚
+  if (label === '荒原' && tileType !== 'wasteland') {
+    pv -= 2;
+  }
+  return pv;
+}
+// 删除所有旧的预览数字
+function clearPreviews() {
+  document.querySelectorAll('.preview-label').forEach(el => el.remove());
+}
+
+// 显示当前 hoverTileId 下的预览
+function showPreviews(hoverTileId) {
+  tileMap.forEach(t => {
+    const hex = document.querySelector(`[data-tile-id="${t.id}"]`);
+    // 只有 hover 的那个 tile 计算 diff，其他一律 0
+    const diff = (String(t.id) === hoverTileId)
+      ? computePotentialProduce(t.type, draggingCardInfo.label, draggingCardInfo.baseProduce)
+      : 0;
+    const lbl = document.createElement('div');
+    lbl.className = 'preview-label';
+    lbl.innerText = (diff > 0 ? '+' + diff : diff);
+    // 上色
+    lbl.style.color = diff > 0 ? 'green' : (diff < 0 ? 'red' : 'black');
+    hex.appendChild(lbl);
   });
 }
 
@@ -453,6 +500,15 @@ function createBuildingCard(info){
   // 拖曳
   card.draggable = true;
   card.addEventListener('dragstart', e => {
+
+  // 结束拖拽：清空状态、恢复不透明、移除预览
+     draggingCardInfo = null;
+     card.classList.remove('dragging');
+     clearPreviews();
+  // 记录拖拽中的卡片 info，并加半透明
+  draggingCardInfo = { baseProduce: info.baseProduce, label: info.label };
+  card.classList.add('dragging');
+    
   // 1. 設定拖曳資料
   e.dataTransfer.setData('cardId', card.dataset.cardId);
   
