@@ -363,3 +363,9 @@ body {
   cursor: pointer;
   z-index: 500;
 }
+
+#preview-diff {
+  font-weight: bold;
+  /* 颜色在 JS 里动态设 */
+}
+
