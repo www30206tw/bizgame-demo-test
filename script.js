@@ -10,6 +10,7 @@ let refreshCount = 0;
 let warningNextRoundShown = false;
 let lastPlacement = null;
 let draggingCardInfo = null;
+let dragOverlay = null;
 
 const rows = [4,5,4,5,4,5,4];
 const typeMapping = {
@@ -687,6 +688,11 @@ function createBuildingCard(info){
   // 拖曳
   card.draggable = true;
   card.addEventListener('dragstart', e => {
+
+  // 取消原生 drag image：用 1×1 透明圖
+  const img = new Image();
+  img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAACVBMVEUAAAD///+l2Z/dAAAACklEQVQI12NgAAAAAgAB4iG8MwAAAABJRU5ErkJggg==';
+  e.dataTransfer.setDragImage(img, 0, 0);
      
   // 记录拖拽中的卡片 info，并加半透明
   draggingCardInfo = {
@@ -697,6 +703,11 @@ function createBuildingCard(info){
      specialAbility:   info.specialAbility || '',
      rarity:           info.rarity
    };
+
+   // 3) 建立自製浮層：clone 當前 card
+  dragOverlay = card.cloneNode(true);
+  dragOverlay.classList.add('drag-overlay');
+  document.body.appendChild(dragOverlay);
   card.classList.add('dragging');
     
   // 1. 設定拖曳資料
@@ -727,6 +738,11 @@ function createBuildingCard(info){
 });
 
  card.addEventListener('dragend', e => {
+  // 移除自製浮層
+  if (dragOverlay) {
+    dragOverlay.remove();
+    dragOverlay = null;
+  }
   // 拖拽結束：清空拖拽狀態、移除預覽、恢復卡片不透明
    draggingCardInfo = null;
    clearPreviews();
@@ -1209,3 +1225,10 @@ window.onload = () => {
   
   document.getElementById('refresh-btn').onclick = refreshCards;
 };
+
+document.addEventListener('drag', e => {
+  if (!dragOverlay) return;
+  // 中心置齊
+  dragOverlay.style.left = (e.clientX - dragOverlay.offsetWidth/2) + 'px';
+  dragOverlay.style.top  = (e.clientY - dragOverlay.offsetHeight/2) + 'px';
+});
