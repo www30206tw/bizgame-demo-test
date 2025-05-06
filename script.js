@@ -588,10 +588,25 @@ function clearPreviews() {
   document.querySelectorAll('.preview-label').forEach(el => el.remove());
   // 同步隱藏左上角那個
   document.getElementById('preview-diff').style.display = 'none';
+  // 還原所有空地的「?」
+   tileMap.forEach(t => {
+     if (!t.buildingPlaced) {
+       const hex = document.querySelector(`[data-tile-id="${t.id}"]`);
+       if (hex) hex.textContent = '?';
+     }
+   });
 }
 
 // 在 body 底下依照每個 hex 的真實畫面座標生成 .preview-label
 function showPreviews() {
+  // 先隱藏所有空地上的「?」
+   tileMap.forEach(t => {
+     if (!t.buildingPlaced) {
+       const hex = document.querySelector(`[data-tile-id="${t.id}"]`);
+       if (hex) hex.textContent = '';
+     }
+   });
+  
   tileMap.forEach(t => {
     const hex = document.querySelector(`[data-tile-id="${t.id}"]`);
     if (!hex) return;
@@ -603,7 +618,7 @@ function showPreviews() {
     const lbl = document.createElement('div');
     lbl.className = 'preview-label';
     lbl.innerText = (diff > 0 ? '+' + diff : diff);
-    lbl.style.color = diff > 0 ? 'green'
+    lbl.style.color = diff > 0 ? '#39ff14'
                      : diff < 0 ? 'red'
                      : 'black';
     lbl.style.left = (r.left + r.width/2) + 'px';
