@@ -384,6 +384,7 @@ function calculateRevenue(map) {
      }
      return sum + v;
    }, 0);
+}
   
   // 模拟：如果把当前拖拽的卡放到 tileId 对应的格子，整轮总收益会变成多少？返回 (新 - 旧)
 function simulateTotalDiff(tileId) {
