@@ -382,3 +382,28 @@ body {
   z-index: 2100 !important;
 }
 
+/* 拖曳中自製卡牌浮層，層級 2000 */
+.drag-overlay {
+  position: fixed;
+  pointer-events: none;
+  opacity: 0.5;
+  z-index: 2000;
+}
+
+/* 預覽數字，用 fixed 定位，層級 2100 */
+.preview-label {
+  position: fixed;
+  transform: translate(-50%, -50%);
+  font-size: 24px;      /* 可以再調大或調粗 */
+  font-weight: bold;
+  pointer-events: none;
+  z-index: 2100 !important;
+}
+
+/* 左上角總影響數 */
+#preview-diff {
+  font-weight: bold;
+  /* 顏色／顯示在 JS 裡動態設定 */
+}
+
+
