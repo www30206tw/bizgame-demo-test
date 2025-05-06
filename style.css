@@ -369,3 +369,16 @@ body {
   /* 颜色在 JS 里动态设 */
 }
 
+/* 拖曳時我們自己的卡牌浮層 */
+.drag-overlay {
+  position: fixed;
+  pointer-events: none;
+  opacity: 0.5;
+  z-index: 2000;   /* 比預設 DOM 高 */
+}
+
+/* 讓預覽數字更罩得住浮層 */
+.preview-label {
+  z-index: 2100 !important;
+}
+
