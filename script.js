@@ -368,9 +368,22 @@ function calculateRevenue(map) {
   }
   });
 
-  // 最后累计
-  return clone.reduce((sum,t)=>(t.buildingPlaced? sum+t.buildingProduce: sum), 0);
-}
+  // 最后累计，包括「廢物利用」和「地價升值」的科技加成
+   const wuluDef  = techDefinitions['廢物利用'];
+   const dijiaDef = techDefinitions['地價升值'];
+   return clone.reduce((sum, t) => {
+     if (!t.buildingPlaced) return sum;
+     let v = t.buildingProduce;
+     // 科技：荒原地塊每等級 + perLevel
+     if (wuluDef && t.type === 'wasteland') {
+       v += wuluDef.perLevel * wuluDef.count;
+     }
+     // 科技：繁華區地塊每等級 + perLevel
+     if (dijiaDef && t.type === 'city') {
+       v += dijiaDef.perLevel * dijiaDef.count;
+     }
+     return sum + v;
+   }, 0);
   
   // 模拟：如果把当前拖拽的卡放到 tileId 对应的格子，整轮总收益会变成多少？返回 (新 - 旧)
 function simulateTotalDiff(tileId) {
