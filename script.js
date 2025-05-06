@@ -565,50 +565,50 @@ function initMapArea(){
 
     // 拖过地块时，显示对应预览
     hex.addEventListener('dragover', e => {
-      if (!draggingCardInfo) return;
-      e.preventDefault();           // 允许 drop
-       clearPreviews();
-       showPreviews(hex.dataset.tileId);
-      // ** 新增：计算并显示总影响 **
-     const diff = simulateTotalDiff(hex.dataset.tileId);
-     const pd = document.getElementById('preview-diff');
-     if (diff === 0) {
-       pd.style.display = 'none';
-     } else {
-       pd.innerText = (diff>0? ' (+'+diff+')' : ' ('+diff+')');
-       pd.style.color = diff>0? 'green' : 'red';
-       pd.style.display = 'inline';
-     }
-      });
+  if (!draggingCardInfo) return;
+  e.preventDefault();
+  clearPreviews();
+  showPreviews();
+  // 顯示左上角總影響
+  const diff = simulateTotalDiff(hex.dataset.tileId);
+  const pd = document.getElementById('preview-diff');
+  if (diff !== 0) {
+    pd.innerText = diff > 0 ? ` (+${diff})` : ` (${diff})`;
+    pd.style.color   = diff > 0 ? 'green' : 'red';
+    pd.style.display = 'inline';
+   }
+  });
 
      mapArea.appendChild(hex);
   });
 }
 
-// 删除所有旧的预览数字
+// 刪除所有舊的預覽數字（body 底下的 .preview-label）
 function clearPreviews() {
   document.querySelectorAll('.preview-label').forEach(el => el.remove());
-  document.querySelectorAll('.hex-tile').forEach(hex => {
-    hex.style.color = '';
-  });
-  // 隐藏左上角总变化 —— 一次就好
+  // 同步隱藏左上角那個
   document.getElementById('preview-diff').style.display = 'none';
 }
 
-// 显示当前 hoverTileId 下的预览
-function showPreviews(hoverTileId) {
+// 在 body 底下依照每個 hex 的真實畫面座標生成 .preview-label
+function showPreviews() {
   tileMap.forEach(t => {
     const hex = document.querySelector(`[data-tile-id="${t.id}"]`);
-     // 隱藏原本的「?」
-     hex.style.color = 'transparent';
-    // 只有 hover 的那个 tile 计算 diff，其他一律 0
+    if (!hex) return;
     const diff = simulateTotalDiff(t.id);
+
+    // 1) 取得畫面座標
+    const r = hex.getBoundingClientRect();
+    // 2) 建立固定定位的 label
     const lbl = document.createElement('div');
     lbl.className = 'preview-label';
     lbl.innerText = (diff > 0 ? '+' + diff : diff);
-    // 上色
-    lbl.style.color = diff > 0 ? 'green' : (diff < 0 ? 'red' : 'black');
-    hex.appendChild(lbl);
+    lbl.style.color = diff > 0 ? 'green'
+                     : diff < 0 ? 'red'
+                     : 'black';
+    lbl.style.left = (r.left + r.width/2) + 'px';
+    lbl.style.top  = (r.top  + r.height/2) + 'px';
+    document.body.appendChild(lbl);
   });
 }
 
