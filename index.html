@@ -20,6 +20,8 @@
       <div class="gold-info">
         金幣：<span id="gold-amount">0</span><br />
         回合收益：<span id="round-gold">0</span>
+        <!-- 道具圖示放這裡 -->
+       <div id="item-icon-container" style="position:absolute; top:10px; right:10px;"></div>
         <span id="preview-diff" style="display:none; margin-left:8px;"></span>
       </div>
       <div class="center-info">
@@ -27,6 +29,15 @@
         <div class="stage-bar" id="stage-bar">時間軸</div>
       </div>
     </div>
+
+    <!-- 道具選擇 Modal（第6回合前彈出，一局僅一次） -->
+   <div id="item-select-modal" class="warning-modal" style="display:none; z-index:1004;">
+     <div class="warning-content">
+       <h2>選擇你的道具</h2>
+       <div class="item-pool" id="item-pool" style="display:flex; gap:12px; justify-content:center; margin:16px 0;"></div>
+       <button id="confirm-item-btn">確定</button>
+     </div>
+   </div>
 
     <!-- 抽卡區塊 (5 張卡牌，選 2) -->
     <div id="draw-section">
