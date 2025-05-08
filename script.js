@@ -15,6 +15,77 @@ let initialTileTypes = [];
 
 const rows = [4,5,4,5,4,5,4];
 
+// 檢查河流塊是否相連，且至少一個在邊緣
+function isRiverLayoutValid(types) {
+  // 建立簡化的 tileMap 結構
+  const nodes = types.map((type, idx) => {
+    // row/col 計算同 createTileMap31
+    let cum = 0, row = 0, col = 0;
+    for (; row < rows.length; row++) {
+      if (idx < cum + rows[row]) { col = idx - cum; break; }
+      cum += rows[row];
+    }
+    return { id: idx+1, type, row, col };
+  });
+  // adjacency
+  const adj = id => {
+    const t = nodes[id-1];
+    const dirs = (t.row % 2===0) ? directionsEven : directionsOdd;
+    return dirs
+      .map(d=> nodes.find(n=> n.row===t.row+d.dr && n.col===t.col+d.dc))
+      .filter(n=> n);
+  };
+  // 找到所有河流塊
+  const rivers = nodes.filter(n=>n.type==='river').map(n=>n.id);
+  if (rivers.length===0) return false;
+  // BFS 檢查連通性
+  const vis = new Set([rivers[0]]), queue=[rivers[0]];
+  while(queue.length){
+    const cur = queue.shift();
+    adj(cur).forEach(n=>{
+      if (n.type==='river' && !vis.has(n.id)) {
+        vis.add(n.id);
+        queue.push(n.id);
+      }
+    });
+  }
+  if (vis.size !== rivers.length) return false;
+  // 邊緣至少一個 river
+  const edgeIds = nodes
+    .filter(n=>{
+      const lastRow = rows.length-1, rowCount=rows[n.row];
+      return n.row===0||n.row===lastRow||n.col===0||n.col===rowCount-1;
+    })
+    .map(n=>n.id);
+  if (!rivers.some(r=> edgeIds.includes(r))) return false;
+  return true;
+}
+
+// 檢查每個貧民窟塊至少有兩個相鄰貧民窟
+function isSlumLayoutValid(types) {
+  const nodes = types.map((type, idx) => {
+    let cum=0,row=0,col=0;
+    for (; row<rows.length; row++) {
+      if (idx<cum+rows[row]) { col = idx-cum; break; }
+      cum += rows[row];
+    }
+    return { id: idx+1, type, row, col };
+  });
+  const adj = id => {
+    const t = nodes[id-1];
+    const dirs = (t.row % 2===0) ? directionsEven : directionsOdd;
+    return dirs
+      .map(d=> nodes.find(n=> n.row===t.row+d.dr && n.col===t.col+d.dc))
+      .filter(n=> n);
+  };
+  return nodes
+    .filter(n=>n.type==='slum')
+    .every(n=>{
+      const cnt = adj(n.id).filter(m=> m.type==='slum').length;
+      return cnt >= 2;
+    });
+}
+
 const cardPoolData = [
   { name:'淨水站', rarity:'普通', label:'河流',     baseProduce:4, specialAbility:'若相鄰地塊有河流地塊，則產出 +1' ,type:'building' },
   { name:'星軌會館', rarity:'稀有', label:'繁華區',  baseProduce:6, specialAbility:'沒有任何建築相臨時，產出額外+2' ,type:'building' },
@@ -89,13 +160,20 @@ function showEndScreen(msg) {
 
 // 每次啟動或重開遊戲時呼叫
 function generateInitialTileTypes() {
-  const types = [
+  const base = [
     ...Array(5).fill('city'),
     ...Array(8).fill('slum'),
     ...Array(6).fill('river'),
     ...Array(12).fill('wasteland')
   ];
-  return shuffle(types);
+  let types;
+  do {
+    types = shuffle([...base]);
+  } while (
+    !isRiverLayoutValid(types) ||
+    !isSlumLayoutValid(types)
+  );
+  return types;
 }
 
 // 重置所有狀態並重新開始
