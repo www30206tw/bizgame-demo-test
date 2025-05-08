@@ -403,6 +403,47 @@ function simulateTotalDiff(tileId) {
   return updated - original;
 }
 
+/**
+ * 返回一個對象：{ tileId: diff, … }
+ * diff = 新的 buildingProduce（含地塊/標籤/特性加成）− 舊的 buildingProduce
+ */
+function simulateTileDiffs(tileId) {
+  // 先深拷貝 tileMap 舊值，用來比較
+  const originalProduces = {};
+  tileMap.forEach(t => {
+    originalProduces[t.id] = t.buildingProduce;
+  });
+
+  // 建一份 cloneMap 並在 cloneMap 上放置拖拽卡
+  const cloneMap = tileMap.map(t => ({ ...t, adjacency: [...t.adjacency] }));
+  const target = cloneMap.find(t => t.id === +tileId);
+  target.buildingPlaced = true;
+  target.buildingBaseProduce = draggingCardInfo.baseProduce;
+  target.buildingLabel       = draggingCardInfo.label;
+  target.buildingName        = draggingCardInfo.name;
+  // 重算所有 cloneMap 的 buildingProduce（可复用 recalcRevenueFromScratch 的逻辑，剔除全局累加）
+  cloneMap.forEach(t => {
+    if (!t.buildingPlaced) return;
+    let pv = t.buildingBaseProduce;
+    // 地塊/標籤基本加成
+    if (t.type==='city')      pv += 2 + (t.buildingLabel==='繁華區'?4:0);
+    else if (t.type==='river')pv += -1 + (t.buildingLabel==='河流'?3:0);
+    if (t.buildingLabel==='荒原' && t.type!=='wasteland') pv -= 2;
+    t.buildingProduce = pv;
+  });
+  // Slum 群聚、相鄰等特性（把 recalcRevenueFromScratch 那段 specialAbility 拷贝到这里，针对 cloneMap 而不是全局）
+  // ……（略，请把你原本 recalcRevenueFromScratch 中所有对 t.buildingProduce 的调整都复制到这里）……
+
+  // 最后返回每个 tile 的增量
+  const diffs = {};
+  cloneMap.forEach(t => {
+    diffs[t.id] = t.buildingPlaced
+      ? t.buildingProduce - originalProduces[t.id]
+      : 0;
+  });
+  return diffs;
+}
+
 // 將地圖渲染到畫面
 function initMapArea(){
   const mapArea = document.getElementById('map-area');
@@ -568,7 +609,7 @@ function initMapArea(){
   if (!draggingCardInfo) return;
   e.preventDefault();
   clearPreviews();
-  showPreviews();
+  showPreviews(hex.dataset.tileId);
   // 顯示左上角總影響
   const diff = simulateTotalDiff(hex.dataset.tileId);
   const pd = document.getElementById('preview-diff');
@@ -586,45 +627,51 @@ function initMapArea(){
 // 刪除所有舊的預覽數字（body 底下的 .preview-label）
 function clearPreviews() {
   document.querySelectorAll('.preview-label').forEach(el => el.remove());
-  // 同步隱藏左上角那個
   document.getElementById('preview-diff').style.display = 'none';
-  // 還原所有空地的「?」
-   tileMap.forEach(t => {
-     if (!t.buildingPlaced) {
-       const hex = document.querySelector(`[data-tile-id="${t.id}"]`);
-       if (hex) hex.textContent = '?';
+  // 如果你记录过上一次 showPreviews 里隐藏过的 idList，可以只还原它们
+  tileMap.forEach(t => {
+    const hex = document.querySelector(`[data-tile-id="${t.id}"]`);
+    if (hex && !t.buildingPlaced) {
+      hex.textContent = '?';
      }
    });
 }
 
-// 在 body 底下依照每個 hex 的真實畫面座標生成 .preview-label
-function showPreviews() {
-  // 先隱藏所有空地上的「?」
-   tileMap.forEach(t => {
-     if (!t.buildingPlaced) {
-       const hex = document.querySelector(`[data-tile-id="${t.id}"]`);
-       if (hex) hex.textContent = '';
-     }
-   });
-  
-  tileMap.forEach(t => {
-    const hex = document.querySelector(`[data-tile-id="${t.id}"]`);
-    if (!hex) return;
-    const diff = simulateTotalDiff(t.id);
+function showPreviews(dropTileId) {
+  // 1) 计算每个格子的 diff
+  const diffs = simulateTileDiffs(dropTileId);
 
-    // 1) 取得畫面座標
+  // 2) 对于 diff ≠ 0 的才显示
+  Object.entries(diffs).forEach(([id, diff]) => {
+    if (diff === 0) return;           // 只关心有变化的
+
+    const hex = document.querySelector(`[data-tile-id="${id}"]`);
+    if (!hex) return;
+
+    // 隐藏问号
+    hex.textContent = '';
+
+    // 获得位置
     const r = hex.getBoundingClientRect();
-    // 2) 建立固定定位的 label
+
+    // 创建并展示 label
     const lbl = document.createElement('div');
     lbl.className = 'preview-label';
     lbl.innerText = (diff > 0 ? '+' + diff : diff);
-    lbl.style.color = diff > 0 ? '#39ff14'
-                     : diff < 0 ? 'red'
-                     : 'black';
+    lbl.style.color = diff > 0 ? '#39ff14' : 'red';  // 亮绿或红
     lbl.style.left = (r.left + r.width/2) + 'px';
     lbl.style.top  = (r.top  + r.height/2) + 'px';
     document.body.appendChild(lbl);
   });
+
+  // 左上角总影响也要改成基于 diffs 的总和（可选）
+  const totalDiff = Object.values(diffs).reduce((s,n)=>s+n,0);
+  const pd = document.getElementById('preview-diff');
+  if (totalDiff !== 0) {
+    pd.innerText = totalDiff > 0 ? ` (+${totalDiff})` : ` (${totalDiff})`;
+    pd.style.color   = totalDiff > 0 ? 'green' : 'red';
+    pd.style.display = 'inline';
+  }
 }
 
 // 更新 UI 顯示
