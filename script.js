@@ -1402,9 +1402,11 @@ function renderItemIcon(){
   const ico = document.createElement('div');
   ico.className = 'item-icon';
   ico.id = 'item-icon';
-  ico.innerText = selectedItem.name[0]; // 或放一張小圖
+  ico.innerText = selectedItem.name;    // 顯示完整道具名稱
   ico.onclick = showItemUseModal;
   ctn.appendChild(ico);
+  // 一加入就把「(可使用)」或冷卻層覆蓋顯示出來
+  updateItemCooldownDisplay();
 }
 
 function showItemUseModal(){
@@ -1441,15 +1443,24 @@ function useItem(){
   document.getElementById('item-icon').classList.add('cooldown');
   updateItemCooldownDisplay();
 }
+
 function updateItemCooldownDisplay(){
   const ico = document.getElementById('item-icon');
-  ico.querySelector('.cooldown-overlay')?.remove();
-  if (itemOnCooldown>0){
-    const ov = document.createElement('div');
-    ov.className = 'cooldown-overlay';
-    ov.innerText = itemOnCooldown;
-    ico.appendChild(ov);
-  }
+   // 先全清除：舊的倒數與「可使用」
+   ico?.querySelectorAll('.cooldown-overlay, .item-usable').forEach(el=>el.remove());
+   if (!ico) return;
+   if (itemOnCooldown > 0) {
+     const ov = document.createElement('div');
+     ov.className = 'cooldown-overlay';
+     ov.innerText = itemOnCooldown;
+     ico.appendChild(ov);
+   } else {
+     // 冷卻結束：顯示「(可使用)」
+     const u = document.createElement('div');
+     u.className = 'item-usable';
+     u.innerText = '(可使用)';
+     ico.appendChild(u);
+   }
 }
 
 // 顯示科技樹 Modal
