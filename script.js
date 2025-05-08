@@ -408,35 +408,22 @@ function simulateTotalDiff(tileId) {
  * diff = 新的 buildingProduce（含地塊/標籤/特性加成）− 舊的 buildingProduce
  */
 function simulateTileDiffs(tileId) {
-  // 先深拷貝 tileMap 舊值，用來比較
+  // 1) 原始產出記錄
   const originalProduces = {};
-  tileMap.forEach(t => {
-    originalProduces[t.id] = t.buildingProduce;
-  });
+  tileMap.forEach(t => originalProduces[t.id] = t.buildingProduce);
 
-  // 建一份 cloneMap 並在 cloneMap 上放置拖拽卡
+  // 2) 深拷貝 map，並把拖拽卡「放到」cloneMap
   const cloneMap = tileMap.map(t => ({ ...t, adjacency: [...t.adjacency] }));
   const target = cloneMap.find(t => t.id === +tileId);
   target.buildingPlaced = true;
   target.buildingBaseProduce = draggingCardInfo.baseProduce;
   target.buildingLabel       = draggingCardInfo.label;
   target.buildingName        = draggingCardInfo.name;
-  // 重算所有 cloneMap 的 buildingProduce（可复用 recalcRevenueFromScratch 的逻辑，剔除全局累加）
-  cloneMap.forEach(t => {
-    if (!t.buildingPlaced) return;
-    let pv = t.buildingBaseProduce;
-    // 地塊/標籤基本加成
-    if (t.type==='city')      pv += 2 + (t.buildingLabel==='繁華區'?4:0);
-    else if (t.type==='river')pv += -1 + (t.buildingLabel==='河流'?3:0);
-    if (t.buildingLabel==='荒原' && t.type!=='wasteland') pv -= 2;
-    t.buildingProduce = pv;
-  });
-  // Slum 群聚、相鄰等特性（把 recalcRevenueFromScratch 那段 specialAbility 拷贝到这里，针对 cloneMap 而不是全局）
-  // ……（略，请把你原本 recalcRevenueFromScratch 中所有对 t.buildingProduce 的调整都复制到这里）……
 
-  // 最后返回每个 tile 的增量
+  // 3) 最後產生 diffs
   const diffs = {};
   cloneMap.forEach(t => {
+    // 只有「放置後」的格子才算，否則當成 0
     diffs[t.id] = t.buildingPlaced
       ? t.buildingProduce - originalProduces[t.id]
       : 0;
@@ -626,15 +613,19 @@ function initMapArea(){
 
 // 刪除所有舊的預覽數字（body 底下的 .preview-label）
 function clearPreviews() {
+  // 1) 刪掉所有舊的 preview-label
   document.querySelectorAll('.preview-label').forEach(el => el.remove());
+
+  // 2) 隱藏左上角總影響
   document.getElementById('preview-diff').style.display = 'none';
-  // 如果你记录过上一次 showPreviews 里隐藏过的 idList，可以只还原它们
+
+  // 3) 只在「真的沒建築」的空地上還原問號
   tileMap.forEach(t => {
     const hex = document.querySelector(`[data-tile-id="${t.id}"]`);
-    if (hex && !t.buildingPlaced) {
+    if (!t.buildingPlaced && hex) {
       hex.textContent = '?';
-     }
-   });
+    }
+  });
 }
 
 function showPreviews(dropTileId) {
