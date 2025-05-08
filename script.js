@@ -12,6 +12,16 @@ let lastPlacement = null;
 let draggingCardInfo = null;
 let dragOverlay = null;
 let initialTileTypes = [];
+let selectedItem = null;
+let itemOnCooldown = 0;
+let itemPicked = false;  // 是否已選過一次
+
+// —— 新增道具系統變數 —— 
+const itemDefinitions = [
+  { id:'support',    name:'呼叫支援',    cooldown:5, ability:'立即獲得100金幣' },
+  { id:'hydro',      name:'水力資源',    cooldown:3, ability:'本回合河流地塊產出翻倍' },
+  { id:'wasteland',  name:'荒地建設',    cooldown:4, ability:'隨機獲得一個荒原建築' },
+];
 
 const rows = [4,5,4,5,4,5,4];
 
@@ -1338,12 +1348,91 @@ document.getElementById('warning-close-btn').onclick = () => {
 
 // 啟動 Draw
 function startDrawPhase(){
+
+  // —— 在第6回合（玩家已付第一次費用後下一回合）插入道具選擇
+  if (currentRound === 6 && !itemPicked) {
+    // 建立 3 張道具卡
+    const pool = document.getElementById('item-pool');
+    pool.innerHTML = '';
+    itemDefinitions.forEach(it => {
+      const div = document.createElement('div');
+      div.className = 'item-card';
+      div.dataset.id = it.id;
+      div.innerHTML = `<h3>${it.name}</h3><p>冷卻：${it.cooldown} 回合</p><p>${it.ability}</p>`;
+      div.onclick = ()=> {
+        pool.querySelectorAll('.item-card').forEach(c=>c.classList.remove('selected'));
+        div.classList.add('selected');
+      };
+      pool.appendChild(div);
+    });
+    document.getElementById('item-select-modal').style.display = 'flex';
+    return;  // 停在道具選擇
+  }
+  // —— 原本流程 —— 
   refreshCount = 0;
   updateRefreshButton();
   document.getElementById('draw-section').style.display='flex';
   document.getElementById('show-draw-btn').style.display = 'none';
   drawCards();
   updateStageBar();
+}
+
+// 道具使用
+function renderItemIcon(){
+  const ctn = document.getElementById('item-icon-container');
+  ctn.innerHTML = '';  // 清空
+  if (!selectedItem) return;
+  const ico = document.createElement('div');
+  ico.className = 'item-icon';
+  ico.id = 'item-icon';
+  ico.innerText = selectedItem.name[0]; // 或放一張小圖
+  ico.onclick = showItemUseModal;
+  ctn.appendChild(ico);
+}
+
+function showItemUseModal(){
+  if (!selectedItem) return;
+  const msg = `${selectedItem.name}\n${selectedItem.ability}\n\n是否使用？\n(冷卻中：${itemOnCooldown||0} 回)`;
+  if (itemOnCooldown > 0) {
+    alert(`${selectedItem.name} 冷卻中，剩餘 ${itemOnCooldown} 回合`);
+    return;
+  }
+  if (confirm(msg)) {
+    useItem();
+  }
+}
+
+function useItem(){
+  switch(selectedItem.id){
+    case 'support':
+      currentGold += 100;
+      updateResourceDisplay();
+      break;
+    case 'hydro':
+      // 設一個 flag，讓本回合河流加成翻倍
+      window.hydroActive = true;
+      recalcRevenueFromScratch();
+      break;
+    case 'wasteland':
+      // 隨機抽一張 label='荒原' 的建築到手牌
+      const pool = cardPoolData.filter(c=>c.label==='荒原' && c.type==='building');
+      const pick = pool[Math.floor(Math.random()*pool.length)];
+      document.getElementById('hand').appendChild(createBuildingCard(pick));
+      break;
+  }
+  itemOnCooldown = selectedItem.cooldown;
+  document.getElementById('item-icon').classList.add('cooldown');
+  updateItemCooldownDisplay();
+}
+function updateItemCooldownDisplay(){
+  const ico = document.getElementById('item-icon');
+  ico.querySelector('.cooldown-overlay')?.remove();
+  if (itemOnCooldown>0){
+    const ov = document.createElement('div');
+    ov.className = 'cooldown-overlay';
+    ov.innerText = itemOnCooldown;
+    ico.appendChild(ov);
+  }
 }
 
 // 顯示科技樹 Modal
@@ -1376,6 +1465,18 @@ function updateTechTree() {
 window.onload = () => {
   // 每次重新載入或重開，先生成一次地塊
   initialTileTypes = generateInitialTileTypes();
+
+  // 道具選擇 Modal 的確認按鈕
+  document.getElementById('confirm-item-btn').onclick = () => {
+    const sel = document.querySelector('#item-pool .item-card.selected');
+    if (!sel) { alert('請選擇一張道具'); return; }
+    selectedItem = itemDefinitions.find(i=>i.id===sel.dataset.id);
+    itemPicked = true;
+    document.getElementById('item-select-modal').style.display = 'none';
+    renderItemIcon();
+    // 選完才開始抽卡
+    startDrawPhase();
+  };
   
   // DOM 參考
   const startScreen = document.getElementById('start-screen');
@@ -1495,7 +1596,15 @@ window.onload = () => {
   // 3. 回合 +1 並更新顯示
   currentRound++;
   updateRoundDisplay();
-  // 4. 開始下一輪抽卡
+  // 4.道具冷卻倒數
+  if (selectedItem && itemOnCooldown>0) {
+    itemOnCooldown--;
+    if (itemOnCooldown===0) {
+      document.getElementById('item-icon').classList.remove('cooldown');
+    }
+    updateItemCooldownDisplay();
+  }
+  // 5. 開始下一輪抽卡
   // 開始新回合時，清除撤銷記錄
   lastPlacement = null;
   document.getElementById('undo-btn').disabled = true;
