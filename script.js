@@ -942,6 +942,16 @@ function updateStageBar() {
   } else {
     bar.textContent = '';
   }
+  
+  // 新增：道具倒數計時
+  const cdEl = document.getElementById('item-countdown');
+  // 如果還沒領道具，且還沒到第6回合，就顯示倒數
+  if (!itemPicked && currentRound < 6) {
+    const turns = 6 - currentRound;
+    cdEl.innerText = `${turns} 回合後可以獲得道具`;
+  } else {
+    cdEl.innerText = '';
+  }
 }
 
 // 建築卡牌生成
