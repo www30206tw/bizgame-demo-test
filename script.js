@@ -11,18 +11,9 @@ let warningNextRoundShown = false;
 let lastPlacement = null;
 let draggingCardInfo = null;
 let dragOverlay = null;
+let initialTileTypes = [];
 
 const rows = [4,5,4,5,4,5,4];
-const typeMapping = {
-  1:'wasteland', 2:'wasteland', 3:'wasteland', 4:'wasteland',
-  5:'wasteland', 6:'slum',      7:'slum',      8:'wasteland',
-  9:'river',     10:'slum',     11:'city',     12:'slum',
-  13:'river',    14:'slum',     15:'city',     16:'city',
-  17:'river',    18:'wasteland',19:'slum',     20:'slum',
-  21:'river',    22:'wasteland',23:'wasteland',24:'slum',
-  25:'river',    26:'wasteland',27:'wasteland',28:'wasteland',
-  29:'river',    30:'wasteland',31:'wasteland'
-};
 
 const cardPoolData = [
   { name:'淨水站', rarity:'普通', label:'河流',     baseProduce:4, specialAbility:'若相鄰地塊有河流地塊，則產出 +1' ,type:'building' },
@@ -94,6 +85,17 @@ let tileMap = [];
 function showEndScreen(msg) {
   document.getElementById('end-title').innerText = msg;
   document.getElementById('end-screen').style.display = 'flex';
+}
+
+// 每次啟動或重開遊戲時呼叫
+function generateInitialTileTypes() {
+  const types = [
+    ...Array(5).fill('city'),
+    ...Array(8).fill('slum'),
+    ...Array(6).fill('river'),
+    ...Array(12).fill('wasteland')
+  ];
+  return shuffle(types);
 }
 
 // 重置所有狀態並重新開始
@@ -192,12 +194,17 @@ function createTileMap31(){
   rows.forEach((count, r) => {
     for (let c = 0; c < count; c++, id++) {
       map.push({
-        id, row:r, col:c,
-        type:typeMapping[id],
-        buildingProduce:0,
-        buildingPlaced:false,
-        slumBonusGranted:false,
-        adjacency:[], x:0, y:0
+        id,
+        row: r,
+        col: c,
+        // 從 initialTileTypes 拿對應位置的類型
+        type: initialTileTypes[id - 1],
+        buildingProduce: 0,
+        buildingPlaced: false,
+        slumBonusGranted: false,
+        adjacency: [],
+        x: 0,
+        y: 0
       });
     }
   });
@@ -1289,6 +1296,9 @@ function updateTechTree() {
 
 // window.onload 初始化
 window.onload = () => {
+  // 每次重新載入或重開，先生成一次地塊
+  initialTileTypes = generateInitialTileTypes();
+  
   // DOM 參考
   const startScreen = document.getElementById('start-screen');
   const startBtn    = document.getElementById('startBtn');
