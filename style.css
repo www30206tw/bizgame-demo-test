@@ -410,4 +410,38 @@ body {
   /* 顏色／顯示在 JS 裡動態設定 */
 }
 
-
+/* 道具選擇 & 圖示 */
+#item-select-modal .item-card {
+  width: 120px;
+  height: 160px;
+  border: 1px solid #333;
+  background: #fafafa;
+  padding: 8px;
+  box-sizing: border-box;
+  cursor: pointer;
+  text-align: center;
+}
+#item-select-modal .item-card.selected {
+  outline: 3px solid #39ff14;
+}
+#item-icon-container .item-icon {
+  width: 40px;
+  height: 40px;
+  margin-left: 8px;
+  position: relative;
+  cursor: pointer;
+  opacity: 1;
+  transition: opacity .3s;
+}
+#item-icon-container .item-icon.cooldown {
+  opacity: .4;
+}
+#item-icon-container .cooldown-overlay {
+  position: absolute;
+  bottom: -4px; right: -4px;
+  background: rgba(0,0,0,.6);
+  color: #fff;
+  font-size:12px;
+  padding:2px 4px;
+  border-radius:4px;
+}
