@@ -775,8 +775,7 @@ function clearPreviews() {
   tileMap.forEach(t => {
     const hex = document.querySelector(`[data-tile-id="${t.id}"]`);
     if (!t.buildingPlaced && hex) hex.textContent = '?';
-    }
-  });
+    });
 }
 
 function showPreviews(dropTileId) {
