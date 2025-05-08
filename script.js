@@ -373,14 +373,14 @@ function calculateRevenue(map) {
     // ……（把 recalcRevenueFromScratch 里对应的那一大段 specialAbility 逻辑全部复制到这里，针对 clone 而非全局）……
     if (t.buildingName === '淨水站') {
        const hasRiverNeighbor = t.adjacency.some(id => {
-        const nt = tileMap.find(x => x.id === id);
+        const nt = clone.find(x => x.id === id);
         return nt && nt.type === 'river';
       });
       if (hasRiverNeighbor) t.buildingProduce++;
    }
     if(t.buildingName==='星軌會館'){
        const hasN = t.adjacency.some(id=>{
-        const nt=tileMap.find(x=>x.id===id);
+        const nt=clone.find(x=>x.id===id);
         return nt&&nt.buildingPlaced;
       });
       if(!hasN) t.buildingProduce+=2;
@@ -388,7 +388,7 @@ function calculateRevenue(map) {
     // 社群站：若與至少 1 座其他建築相鄰，額外 +1
    if(t.buildingName==='社群站'){
        const hasNeighbor = t.adjacency.some(id=>{
-       const nt=tileMap.find(x=>x.id===id);
+       const nt=clone.find(x=>x.id===id);
        return nt&&nt.buildingPlaced;
      });
      if(hasNeighbor) t.buildingProduce++;
@@ -405,7 +405,7 @@ function calculateRevenue(map) {
   // 地脈節點：若相鄰建築恰為2，則包含自己在內的3座每座+1
    if(t.buildingName==='地脈節點'){
      const nei = t.adjacency
-       .map(id=>tileMap.find(x=>x.id===id))
+       .map(id=>clone.find(x=>x.id===id))
        .filter(x=>x && x.buildingPlaced);
      if(nei.length===2){
        t.buildingProduce++;
@@ -415,7 +415,7 @@ function calculateRevenue(map) {
   // 匯聚平臺：若與3座以上建築相鄰，額外+2
    if(t.buildingName==='匯聚平臺'){
      const cnt = t.adjacency
-       .map(id=>tileMap.find(x=>x.id===id))
+       .map(id=>clone.find(x=>x.id===id))
        .filter(x=>x && x.buildingPlaced)
        .length;
      if(cnt>3) t.buildingProduce+=2;
@@ -423,7 +423,7 @@ function calculateRevenue(map) {
   // 流動站：若自身在河流上，相鄰且也在河流的建築每座+1
    if(t.buildingName==='流動站' && t.type==='river'){
      t.adjacency.forEach(id=>{
-       const x=tileMap.find(y=>y.id===id);
+       const x=clone.find(y=>y.id===id);
        if(x && x.buildingPlaced && x.type==='river'){
          x.buildingProduce++;
        }
@@ -442,7 +442,7 @@ function calculateRevenue(map) {
   // 垂直農倉：每有 1 座鄰接的垂直農倉，+1（金幣），最多 +2
   if (t.buildingName === '垂直農倉') {
     const neiCount = t.adjacency.filter(id => {
-      const nt = tileMap.find(x => x.id === id);
+      const nt = clone.find(x => x.id === id);
       return nt && nt.buildingPlaced && nt.buildingName === '垂直農倉';
     }).length;
     t.buildingProduce += Math.min(neiCount, 2);
@@ -454,7 +454,7 @@ function calculateRevenue(map) {
     // 貧民窟標籤：蓋在貧民窟時，相鄰每座建築 +1
     if (t.type === 'slum') {
       const adjCount = t.adjacency.filter(id => {
-        const nt = tileMap.find(x => x.id === id);
+        const nt = clone.find(x => x.id === id);
         return nt && nt.buildingPlaced;
       }).length;
       t.buildingProduce += adjCount;
@@ -1330,11 +1330,16 @@ function recalcRevenueFromScratch(){
     if (t.type === 'river') t.buildingProduce += 3;
   }
   });
-  // —— 新增：水力資源道具生效 —— 
-  if (window.hydroActive && t.type === 'river') {
-    t.buildingProduce *= 2;
-  }
+
+   // —— 新增：水力资源道具生效 —— 
+  tileMap.forEach(t => {
+    if (window.hydroActive && t.type === 'river') {
+      t.buildingProduce *= 2;
+    }
+  });
+  // 用完就清掉 flag，下一回合失效
   window.hydroActive = false;
+  
   // 5. 累加
   tileMap.forEach(t => {
     if (!t.buildingPlaced) return;
