@@ -1330,6 +1330,11 @@ function recalcRevenueFromScratch(){
     if (t.type === 'river') t.buildingProduce += 3;
   }
   });
+  // —— 新增：水力資源道具生效 —— 
+  if (window.hydroActive && t.type === 'river') {
+    t.buildingProduce *= 2;
+  }
+  window.hydroActive = false;
   // 5. 累加
   tileMap.forEach(t => {
     if (!t.buildingPlaced) return;
