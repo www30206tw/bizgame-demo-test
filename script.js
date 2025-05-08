@@ -408,22 +408,181 @@ function simulateTotalDiff(tileId) {
  * diff = 新的 buildingProduce（含地塊/標籤/特性加成）− 舊的 buildingProduce
  */
 function simulateTileDiffs(tileId) {
-  // 1) 原始產出記錄
+  // 1) 记录旧的 buildingProduce
   const originalProduces = {};
   tileMap.forEach(t => originalProduces[t.id] = t.buildingProduce);
 
-  // 2) 深拷貝 map，並把拖拽卡「放到」cloneMap
+  // 2) 深拷贝并放置新卡
   const cloneMap = tileMap.map(t => ({ ...t, adjacency: [...t.adjacency] }));
   const target = cloneMap.find(t => t.id === +tileId);
-  target.buildingPlaced = true;
-  target.buildingBaseProduce = draggingCardInfo.baseProduce;
-  target.buildingLabel       = draggingCardInfo.label;
-  target.buildingName        = draggingCardInfo.name;
+  target.buildingPlaced       = true;
+  target.buildingBaseProduce  = draggingCardInfo.baseProduce;
+  target.buildingLabel        = draggingCardInfo.label;
+  target.buildingName         = draggingCardInfo.name;
 
-  // 3) 最後產生 diffs
+  // —— **3) 在这里完整地重算 cloneMap 上的每个 buildingProduce** —— 
+  //  （把 recalcRevenueFromScratch 里所有变动 buildingProduce 的代码，
+  //   改成作用在 cloneMap，而不是 tileMap，就放到这里。）
+
+  // a) 先地块+标签+荒原
+  cloneMap.forEach(t => {
+    if (!t.buildingPlaced) return;
+    let pv = t.buildingBaseProduce;
+    if (t.type === 'city') {
+      pv += 2;
+      if (t.buildingLabel === '繁華區') pv += 4;
+    } else if (t.type === 'river') {
+      pv -= 1;
+      if (t.buildingLabel === '河流') pv += 3;
+    }
+    if (t.buildingLabel === '荒原' && t.type !== 'wasteland') {
+      pv -= 2;
+    }
+    t.buildingProduce = pv;
+  });
+
+  // b) slum 群聚
+  {
+    const visited = new Set();
+    cloneMap.forEach(t => {
+      if (!t.buildingPlaced || t.type !== 'slum' || visited.has(t.id)) return;
+      const queue = [t.id], cluster = [];
+      while (queue.length) {
+        const id = queue.shift();
+        if (visited.has(id)) continue;
+        visited.add(id);
+        const ct = cloneMap.find(x => x.id === id);
+        if (ct && ct.buildingPlaced && ct.type === 'slum') {
+          cluster.push(ct);
+          ct.adjacency.forEach(nid => {
+            if (!visited.has(nid)) queue.push(nid);
+          });
+        }
+      }
+      if (cluster.length >= 3) {
+        cluster.forEach(ct => ct.buildingProduce++);
+      }
+    });
+  }
+
+  // c) slum 相鄰貧民窟
+  cloneMap.forEach(t => {
+    if (!t.buildingPlaced || t.type !== 'slum' || t.buildingLabel !== '貧民窟') return;
+    const adjCount = t.adjacency
+      .map(id => cloneMap.find(x => x.id === id))
+      .filter(x => x && x.buildingPlaced).length;
+    t.buildingProduce += Math.min(adjCount, 5);
+  });
+
+  // d) 各種 specialAbility（淨水站、星軌會館、社群站……）  
+  //    **――完全照搬 recalcRevenueFromScratch 那段**――
+  cloneMap.forEach(t => {
+    if (!t.buildingPlaced) return;
+    // 淨水站
+    if (t.buildingName === '淨水站') {
+      const hasRiverNeighbor = t.adjacency.some(id => {
+        const nt = cloneMap.find(x => x.id === id);
+        return nt && nt.type === 'river';
+      });
+      if (hasRiverNeighbor) t.buildingProduce++;
+    }
+    // 星軌會館
+    if (t.buildingName === '星軌會館') {
+      const hasN = t.adjacency.some(id => {
+        const nt = cloneMap.find(x => x.id === id);
+        return nt && nt.buildingPlaced;
+      });
+      if (!hasN) t.buildingProduce += 2;
+    }
+    // 社群站
+    if (t.buildingName === '社群站') {
+      const hasNeighbor = t.adjacency.some(id => {
+        const nt = cloneMap.find(x => x.id === id);
+        return nt && nt.buildingPlaced;
+      });
+      if (hasNeighbor) t.buildingProduce++;
+    }
+    // 彈出商亭
+    if (t.buildingName === '彈出商亭') {
+      const { row, col } = t, lastRow = rows.length - 1, rowCount = rows[row];
+      if (row === 0 || row === lastRow || col === 0 || col === rowCount - 1) {
+        t.buildingProduce++;
+      }
+    }
+    // 地脈節點
+    if (t.buildingName === '地脈節點') {
+      const nei = t.adjacency
+        .map(id => cloneMap.find(x => x.id === id))
+        .filter(x => x && x.buildingPlaced);
+      if (nei.length === 2) {
+        t.buildingProduce++;
+        nei.forEach(x => x.buildingProduce++);
+      }
+    }
+    // 匯聚平臺
+    if (t.buildingName === '匯聚平臺') {
+      const cnt = t.adjacency
+        .map(id => cloneMap.find(x => x.id === id))
+        .filter(x => x && x.buildingPlaced).length;
+      if (cnt > 3) t.buildingProduce += 2;
+    }
+    // 流動站
+    if (t.buildingName === '流動站' && t.type === 'river') {
+      t.adjacency.forEach(id => {
+        const x = cloneMap.find(y => y.id === id);
+        if (x && x.buildingPlaced && x.type === 'river') {
+          x.buildingProduce++;
+        }
+      });
+    }
+    // 焚料方艙
+    if (t.buildingName === '焚料方艙' && currentRound % 2 === 0) {
+      t.buildingProduce = Math.max(t.buildingProduce - 1, 4);
+    }
+    // 灣岸輸能站
+    if (t.buildingName === '灣岸輸能站' && t.type !== 'river') {
+      t.buildingProduce--;
+    }
+    // 垂直農倉
+    if (t.buildingName === '垂直農倉') {
+      const cnt = t.adjacency
+        .map(id => cloneMap.find(x => x.id === id))
+        .filter(x => x && x.buildingPlaced && x.buildingName === '垂直農倉').length;
+      t.buildingProduce += Math.min(cnt, 2);
+    }
+    // 通訊樞紐
+    if (t.buildingName === '通訊樞紐') {
+      if (t.type === 'city') t.buildingProduce += 4;
+      if (t.type === 'slum') {
+        const cnt = t.adjacency
+          .filter(id => {
+            const nt = cloneMap.find(x => x.id === id);
+            return nt && nt.buildingPlaced;
+          }).length;
+        t.buildingProduce += cnt;
+      }
+      if (t.type === 'river') t.buildingProduce += 3;
+    }
+  });
+
+  // —— 新增：將「廢物利用」與「地價升值」的科技加成，應用到每個格子的 buildingProduce —— 
+   const wuluDef  = techDefinitions['廢物利用'];
+   const dijiaDef = techDefinitions['地價升值'];
+   cloneMap.forEach(t => {
+     if (!t.buildingPlaced) return;
+     // 荒原地塊的「廢物利用」
+     if (wuluDef && t.type === 'wasteland') {
+       t.buildingProduce += wuluDef.perLevel * wuluDef.count;
+     }
+     // 繁華區地塊的「地價升值」
+     if (dijiaDef && t.type === 'city') {
+       t.buildingProduce += dijiaDef.perLevel * dijiaDef.count;
+     }
+   });
+
+  // 4) 产出 diffs
   const diffs = {};
   cloneMap.forEach(t => {
-    // 只有「放置後」的格子才算，否則當成 0
     diffs[t.id] = t.buildingPlaced
       ? t.buildingProduce - originalProduces[t.id]
       : 0;
@@ -622,8 +781,7 @@ function clearPreviews() {
   // 3) 只在「真的沒建築」的空地上還原問號
   tileMap.forEach(t => {
     const hex = document.querySelector(`[data-tile-id="${t.id}"]`);
-    if (!t.buildingPlaced && hex) {
-      hex.textContent = '?';
+    if (!t.buildingPlaced && hex) hex.textContent = '?';
     }
   });
 }
