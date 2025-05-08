@@ -866,11 +866,18 @@ function clearPreviews() {
   // 2) 隱藏左上角總影響
   document.getElementById('preview-diff').style.display = 'none';
 
-  // 3) 只在「真的沒建築」的空地上還原問號
+  // 3) 所有格子重置顯示：如果有建築，顯示名稱；沒有則顯示 '?'
   tileMap.forEach(t => {
     const hex = document.querySelector(`[data-tile-id="${t.id}"]`);
-    if (!t.buildingPlaced && hex) hex.textContent = '?';
-    });
+    if (!hex) return;
+    if (t.buildingPlaced) {
+      // 恢復已放的建築名稱
+      hex.innerHTML = `<div class="hex-name">${t.buildingName}</div>`;
+    } else {
+      // 恢復空地的問號
+      hex.textContent = '?';
+    }
+  });
 }
 
 function showPreviews(dropTileId) {
