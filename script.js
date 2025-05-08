@@ -564,14 +564,14 @@ function simulateTileDiffs(tileId) {
   const wuluDef  = techDefinitions['廢物利用'];
   const dijiaDef = techDefinitions['地價升值'];
   cloneMap.forEach(t => {
-    if (!t.buildingPlaced) return;
-    if (wuluDef && t.type === 'wasteland') {
-      t.buildingProduce += wuluDef.perLevel * wuluDef.count;
-    }
-    if (dijiaDef && t.type === 'city') {
-      t.buildingProduce += dijiaDef.perLevel * dijiaDef.count;
-    }
-  });
+     if (!t.buildingPlaced) return;
+     if (wuluDef && t.type === 'wasteland') {
+       t.buildingProduce += wuluDef.perLevel * wuluDef.count;
+     }
+     if (dijiaDef && t.type === 'city') {
+       t.buildingProduce += dijiaDef.perLevel * dijiaDef.count;
+     }
+   });  // ← 這行不要忘記！
 
   // 4) 計算 diff 並回傳
   const diffs = {};
