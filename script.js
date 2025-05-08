@@ -560,7 +560,7 @@ function simulateTileDiffs(tileId) {
     }
   });
 
-  // 3.5 —— 新增：科技加成 —— 
+ // 3.5 —— 新增：科技加成 —— 
   const wuluDef  = techDefinitions['廢物利用'];
   const dijiaDef = techDefinitions['地價升值'];
   cloneMap.forEach(t => {
