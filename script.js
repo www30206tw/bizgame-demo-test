@@ -16,6 +16,7 @@ let selectedItem = null;
 let itemOnCooldown = 0;
 let itemPicked = false;  // 是否已選過一次
 let nextEventRound = null;
+let currentEvent = null;
 let eventName = 'Y事件';   // 暂用占位，后续再动态替换
 
 // —— 新增道具系統變數 —— 
@@ -24,6 +25,30 @@ const itemDefinitions = [
   { id:'hydro',      name:'水力資源',    cooldown:3, ability:'本回合河流地塊產出翻倍' },
   { id:'wasteland',  name:'荒地建設',    cooldown:4, ability:'隨機獲得一個荒原建築' },
 ];
+
+// ——— 事件系統 ———
+const eventDefinitions = [
+  {
+    id: 'wastelandSandstorm',
+    name: '荒原沙暴',
+    outcomes: [
+      { range: [1,2], text: '本回合所有荒原建築產出為0',
+        effect: () => { window.sandstormActive = true; } },
+      { range: [3,4], text: '立即獲得50金幣',
+        effect: () => { currentGold += 50; updateResourceDisplay(); } },
+      { range: [5,6], text: '立即獲得2張隨機的荒原建築',
+        effect: () => {
+          for (let i=0; i<2; i++) {
+            const pool = cardPoolData.filter(c=>c.label==='荒原'&&c.type==='building');
+            const pick = pool[Math.floor(Math.random()*pool.length)];
+            document.getElementById('hand').appendChild(createBuildingCard(pick));
+          }
+        }
+      }
+    ]
+  }
+];
+
 
 const rows = [4,5,4,5,4,5,4];
 
@@ -1528,6 +1553,39 @@ function updateTechTree() {
   }
 }
 
+ function showEvent() {
+  // 顯示 event-modal
+  document.getElementById('event-title').innerText = currentEvent.name;
+  const opts = document.getElementById('event-options');
+  opts.innerHTML = '';
+  currentEvent.outcomes.forEach(o => {
+    opts.innerHTML += `<p>${o.range[0]}–${o.range[1]}：${o.text}</p>`;
+  });
+  document.getElementById('event-modal').style.display = 'flex';
+}
+
+// 玩家按「抽取」
+document.getElementById('roll-event-btn').onclick = () => {
+  const roll = Math.floor(Math.random()*6) + 1;
+  const outcome = currentEvent.outcomes.find(o => roll >= o.range[0] && roll <= o.range[1]);
+  // 先關閉事件選項
+  document.getElementById('event-modal').style.display = 'none';
+  // 執行效果
+  outcome.effect();
+  // 顯示結果
+  document.getElementById('event-result-text').innerText = `擲骰：${roll} → ${outcome.text}`;
+  document.getElementById('event-result-modal').style.display = 'flex';
+};
+
+// 玩家按「確定」關閉結果
+document.getElementById('event-result-close-btn').onclick = () => {
+  document.getElementById('event-result-modal').style.display = 'none';
+  // 重新排下一次事件，並繼續後面的扣款／下一回合邏輯
+  scheduleNextEvent(currentRound);
+  // 扣款、+1回合、啟抽卡……
+  // （把原本 endTurnBtn.onclick 裡在事件之後的程式碼抽到一支 helper 裡呼叫即可）
+};
+
 // window.onload 初始化
 window.onload = () => {
   // 每次重新載入或重開，先生成一次地塊
@@ -1610,6 +1668,9 @@ window.onload = () => {
   hand.appendChild(card);
   // 3. 重算收益
   recalcRevenueFromScratch();
+  if (window.sandstormActive && t.buildingLabel === '荒原') {
+  t.buildingProduce = 0;
+  window.sandstormActive = false;
   // 4. 關閉撤銷
   lastPlacement = null;
   undoBtn.disabled = true;
@@ -1685,9 +1746,8 @@ window.onload = () => {
 
   // 如果到事件回合
   if (currentRound === nextEventRound) {
-    showModal(`事件发生：${eventName}`);
-    // TODO: 事件效果的具体逻辑以后再补
-    scheduleNextEvent(currentRound);
+    showEvent();               // 改這裡
+    return;                    // 中斷，等玩家抽完骰子才進下一回
   }
     
   // 5. 開始下一輪抽卡
@@ -1716,7 +1776,11 @@ function scheduleNextEvent(fromRound) {
     candidate = fromRound + Math.floor(Math.random()*4) + 3;  // +3~6
   } while (paymentRounds.includes(candidate));
   nextEventRound = candidate;
+  // 新增：挑一個事件
+  currentEvent = eventDefinitions[Math.floor(Math.random()*eventDefinitions.length)];
+  eventName = currentEvent.name;
 }
+
 
 document.addEventListener('drag', e => {
   if (!dragOverlay) return;
