@@ -1655,30 +1655,32 @@ window.onload = () => {
   
   undoBtn.disabled = true;  // 初始關閉
   undoBtn.onclick = () => {
-  if (!lastPlacement) return;
-  // 1. 把地塊上建築移除
-  const tile = tileMap.find(x => x.id === lastPlacement.tileId);
-  tile.buildingPlaced = false;
-  // 額外：清空地塊上的顯示，恢復成「?」
-  document.querySelector(`[data-tile-id="${tile.id}"]`).innerHTML = '?';
-  // 2. 卡牌回手牌
-  const hand = document.getElementById('hand');
-  const card = createBuildingCard(lastPlacement.building);
-  hand.appendChild(card);
-  // 3. 重算收益
-  recalcRevenueFromScratch();
-  if (window.sandstormActive && t.buildingLabel === '荒原') {
-  t.buildingProduce = 0;
-  window.sandstormActive = false;
-  // 4. 關閉撤銷
-  lastPlacement = null;
-  undoBtn.disabled = true;
-  };
-
-  // 建立並渲染地圖
-  tileMap = createTileMap31();
-  computeAdj();
-  initMapArea();
+     if (!lastPlacement) return;
+     // 1. 把地塊上建築移除
+     const tile = tileMap.find(x => x.id === lastPlacement.tileId);
+     tile.buildingPlaced = false;
+     // 額外：清空地塊上的顯示，恢復成「?」
+     document.querySelector(`[data-tile-id="${tile.id}"]`).innerHTML = '?';
+     // 2. 卡牌回手牌
+     const hand = document.getElementById('hand');
+     const card = createBuildingCard(lastPlacement.building);
+     hand.appendChild(card);
+     // 3. 重算收益
+     recalcRevenueFromScratch();
+     // 如果當回合有沙暴效果，且是荒原建築，將它的產出清 0
+     if (window.sandstormActive && tile.buildingLabel === '荒原') {
+       tile.buildingProduce = 0;
+       window.sandstormActive = false;
+     }
+     // 4. 關閉撤銷
+     lastPlacement = null;
+     undoBtn.disabled = true;
+   };  // ← 这里一定要加上这一行，完整关闭 undoBtn.onclick 的大括号
+ 
+   // 建立並渲染地圖
+   tileMap = createTileMap31();
+   computeAdj();
+   initMapArea();
 
   // 初始顯示
   updateRoundDisplay();
