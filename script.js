@@ -1523,6 +1523,8 @@ window.onload = () => {
      const drawSec = document.getElementById('draw-section');
      drawSec.style.display = 'none';
      showDrawBtn.style.display = 'block';
+    // 隱藏抽卡時禁止結束回合
+     document.getElementById('end-turn-btn').disabled = true;
      console.log('hide-draw-btn clicked, draw-section hidden');
    });
  
@@ -1533,6 +1535,8 @@ window.onload = () => {
      const drawSec = document.getElementById('draw-section');
      drawSec.style.display = 'flex';
      showDrawBtn.style.display = 'none';
+    // 顯示抽卡時恢復結束回合
+     document.getElementById('end-turn-btn').disabled = false;
      console.log('show-draw-btn clicked, draw-section shown');
    });
 
