@@ -998,9 +998,9 @@ function updateStageBar() {
   const evEl = document.getElementById('event-countdown');
   const diffEvt = nextEventRound - currentRound;
   if (diffEvt > 0) {
-    evEl.innerText = `${diffEvt} 回合后会发生${eventName}`;
+    evEl.innerText = `${diffEvt} 回合後會發生${eventName}`;
   } else if (diffEvt === 0) {
-    evEl.innerText = `本回合会发生${eventName}`;
+    evEl.innerText = `本回合會發生${eventName}`;
   } else {
     evEl.innerText = '';
   }
