@@ -15,6 +15,8 @@ let initialTileTypes = [];
 let selectedItem = null;
 let itemOnCooldown = 0;
 let itemPicked = false;  // 是否已選過一次
+let nextEventRound = null;
+let eventName = 'Y事件';   // 暂用占位，后续再动态替换
 
 // —— 新增道具系統變數 —— 
 const itemDefinitions = [
@@ -966,6 +968,17 @@ function updateStageBar() {
   } else {
     cdEl.innerText = '';
   }
+
+  // 新增：事件倒數計時
+  const evEl = document.getElementById('event-countdown');
+  const diffEvt = nextEventRound - currentRound;
+  if (diffEvt > 0) {
+    evEl.innerText = `${diffEvt} 回合后会发生${eventName}`;
+  } else if (diffEvt === 0) {
+    evEl.innerText = `本回合会发生${eventName}`;
+  } else {
+    evEl.innerText = '';
+  }
 }
 
 // 建築卡牌生成
@@ -1655,6 +1668,7 @@ window.onload = () => {
         return;
       }
     }
+    
   // 3. 回合 +1 並更新顯示
   currentRound++;
   updateRoundDisplay();
@@ -1666,6 +1680,14 @@ window.onload = () => {
     }
     updateItemCooldownDisplay();
   }
+
+  // 如果到事件回合
+  if (currentRound === nextEventRound) {
+    showModal(`事件发生：${eventName}`);
+    // TODO: 事件效果的具体逻辑以后再补
+    scheduleNextEvent(currentRound);
+  }
+    
   // 5. 開始下一輪抽卡
   // 開始新回合時，清除撤銷記錄
   lastPlacement = null;
@@ -1684,6 +1706,15 @@ window.onload = () => {
   
   document.getElementById('refresh-btn').onclick = refreshCards;
 };
+
+function scheduleNextEvent(fromRound) {
+  const paymentRounds = Object.keys(paymentSchedule).map(n=>+n);
+  let candidate;
+  do {
+    candidate = fromRound + Math.floor(Math.random()*4) + 3;  // +3~6
+  } while (paymentRounds.includes(candidate));
+  nextEventRound = candidate;
+}
 
 document.addEventListener('drag', e => {
   if (!dragOverlay) return;
