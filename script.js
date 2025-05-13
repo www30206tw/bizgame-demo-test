@@ -1367,16 +1367,20 @@ function startDrawPhase(){
     const pool = document.getElementById('item-pool');
     pool.innerHTML = '';
     itemDefinitions.forEach(it => {
-      const div = document.createElement('div');
-      div.className = 'item-card';
-      div.dataset.id = it.id;
-      div.innerHTML = `<h3>${it.name}</h3><p>冷卻：${it.cooldown} 回合</p><p>${it.ability}</p>`;
-      div.onclick = ()=> {
-        pool.querySelectorAll('.item-card').forEach(c=>c.classList.remove('selected'));
-        div.classList.add('selected');
-      };
-      pool.appendChild(div);
-    });
+    const div = document.createElement('div');
+    div.className = 'card item-card';        // 加上 .card 即可套用原本卡牌樣式
+    div.dataset.id = it.id;
+    div.innerHTML = `
+      <div class="card-name">${it.name}</div>
+      <div class="card-ability">冷卻：${it.cooldown} 回合<br>${it.ability}</div>
+      <div class="card-type">道具</div>
+    `;
+    div.onclick = () => {
+      pool.querySelectorAll('.item-card').forEach(c => c.classList.remove('selected'));
+      div.classList.add('selected');
+    };
+    pool.appendChild(div);
+  });
     document.getElementById('item-select-modal').style.display = 'flex';
     return;  // 停在道具選擇
   }
@@ -1588,6 +1592,11 @@ window.onload = () => {
   document.getElementById('tech-button').onclick    = showTechModal;
   document.getElementById('close-tech-btn').onclick = hideTechModal;
   endTurnBtn.onclick = () => {
+  // —— 如果有道具且冷卻歸零，先跳確認框 —— 
+    if (selectedItem && itemOnCooldown === 0) {
+      const ok = confirm('目前還有可使用的道具，是否結束回合？');
+      if (!ok) return;  // 取消結束回合，留在本回合
+    }
   // 1. 直接把「回合收益」加給玩家
   currentGold += roundRevenue;
   updateResourceDisplay();
