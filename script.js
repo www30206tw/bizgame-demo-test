@@ -655,18 +655,16 @@ function simulateTileDiffs(tileId) {
     }
   });
 
- // 3.5 —— 新增：科技加成 —— 
-  const wuluDef  = techDefinitions['廢物利用'];
-  const dijiaDef = techDefinitions['地價升值'];
-  cloneMap.forEach(t => {
-     if (!t.buildingPlaced) return;
-     if (wuluDef && t.type === 'wasteland') {
-       t.buildingProduce += wuluDef.perLevel * wuluDef.count;
-     }
-     if (dijiaDef && t.type === 'city') {
-       t.buildingProduce += dijiaDef.perLevel * dijiaDef.count;
-     }
-   });  // ← 這行不要忘記！
+ // —— 新增：單格科技加成 —— 
+   // 只對目標 target 這一格套用科技效果，其它 cloneMap 格子不加
+   const wuluDef  = techDefinitions['廢物利用'];
+   const dijiaDef = techDefinitions['地價升值'];
+   if (wuluDef && target.type === 'wasteland') {
+     target.buildingProduce += wuluDef.perLevel * wuluDef.count;
+   }
+   if (dijiaDef && target.type === 'city') {
+     target.buildingProduce += dijiaDef.perLevel * dijiaDef.count;
+   }
 
   // 4) 計算 diff 並回傳
   const diffs = {};
@@ -844,14 +842,6 @@ function initMapArea(){
   e.preventDefault();
   clearPreviews();
   showPreviews(hex.dataset.tileId);
-  // 顯示左上角總影響
-  const diff = simulateTotalDiff(hex.dataset.tileId);
-  const pd = document.getElementById('preview-diff');
-  if (diff !== 0) {
-    pd.innerText = diff > 0 ? ` (+${diff})` : ` (${diff})`;
-    pd.style.color   = diff > 0 ? 'green' : 'red';
-    pd.style.display = 'inline';
-   }
   });
 
      mapArea.appendChild(hex);
@@ -914,7 +904,8 @@ function showPreviews(dropTileId) {
     pd.innerText = totalDiff > 0 ? ` (+${totalDiff})` : ` (${totalDiff})`;
     pd.style.color   = totalDiff > 0 ? 'green' : 'red';
     pd.style.display = 'inline';
-  }
+   } else {
+    pd.style.display = 'none';}
 }
 
 // 更新 UI 顯示
