@@ -1732,10 +1732,20 @@ window.onload = () => {
         return;
       }
     }
-    
+
+  // 如果到事件回合
+  if (currentRound === nextEventRound) {
+    // 先更新左上角倒數文字（diffEvt===0）
+    updateStageBar();
+    showEvent();               // 改這裡
+    return;                    // 中斷，等玩家抽完骰子才進下一回
+  }
+
   // 3. 回合 +1 並更新顯示
   currentRound++;
   updateRoundDisplay();
+  updateStageBar();
+    
   // 4.道具冷卻倒數
   if (selectedItem && itemOnCooldown>0) {
     itemOnCooldown--;
@@ -1743,12 +1753,6 @@ window.onload = () => {
       document.getElementById('item-icon').classList.remove('cooldown');
     }
     updateItemCooldownDisplay();
-  }
-
-  // 如果到事件回合
-  if (currentRound === nextEventRound) {
-    showEvent();               // 改這裡
-    return;                    // 中斷，等玩家抽完骰子才進下一回
   }
     
   // 5. 開始下一輪抽卡
