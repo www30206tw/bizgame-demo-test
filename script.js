@@ -1404,27 +1404,28 @@ function recalcRevenueFromScratch(){
   }
   });
 
-  // 5. 累加（把水力資源的翻倍只臨時套用，不改 buildingProduce）
+  // 5. 累加（考慮沙暴、水力與科技）
   const wuluDef  = techDefinitions['廢物利用'];
   const dijiaDef = techDefinitions['地價升值'];
   tileMap.forEach(t => {
     if (!t.buildingPlaced) return;
     let val = t.buildingProduce;
+    // 荒原沙暴：本回合所有荒原地塊產出 = 0
+    if (window.sandstormActive && t.type === 'wasteland') {
+      val = 0;
+    }
     // 水力資源：河流地塊當回合產出翻倍
     if (window.hydroActive && t.type === 'river') {
       val *= 2;
     }
     // 科技加成
-    if (wuluDef && t.type === 'wasteland') {
-      val += wuluDef.perLevel * wuluDef.count;
-    }
-    if (dijiaDef && t.type === 'city') {
-      val += dijiaDef.perLevel * dijiaDef.count;
-    }
+    if (wuluDef  && t.type === 'wasteland') val += wuluDef.perLevel * wuluDef.count;
+    if (dijiaDef && t.type === 'city')     val += dijiaDef.perLevel * dijiaDef.count;
     total += val;
   });
-  // 用完就清掉 flag，下一回合失效
-  window.hydroActive = false;
+  // 清除本回合 flag
+  window.sandstormActive = false;
+  window.hydroActive     = false;
 
   roundRevenue = total;
   updateResourceDisplay();
