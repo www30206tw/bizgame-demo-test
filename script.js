@@ -1639,8 +1639,9 @@ window.onload = () => {
     renderItemIcon();
     // 選完才開始抽卡
     startDrawPhase();
-  };
-  
+   };
+ };
+
   // DOM 參考
   const startScreen = document.getElementById('start-screen');
   const startBtn    = document.getElementById('startBtn');
