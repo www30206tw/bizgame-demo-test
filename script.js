@@ -48,6 +48,24 @@ const eventDefinitions = [
   }
 ];
 
+/**
+ * 随机安排下一次事件：
+ *  - 到下一个回合 (3~6 回合后)，且不与收取金币回合冲突
+ *  - 随机选一个事件赋给 currentEvent
+ */
+function scheduleNextEvent(round) {
+  let offset, candidate;
+  do {
+    offset    = Math.floor(Math.random() * 4) + 3;  // 3~6
+    candidate = round + offset;
+  } while (paymentSchedule[candidate] !== undefined);
+
+  nextEventRound = candidate;
+  // 随机挑一个事件
+  currentEvent   = eventDefinitions[
+    Math.floor(Math.random() * eventDefinitions.length)
+  ];
+}
 
 const rows = [4,5,4,5,4,5,4];
 
@@ -998,9 +1016,9 @@ function updateStageBar() {
   const evEl = document.getElementById('event-countdown');
   const diffEvt = nextEventRound - currentRound;
   if (diffEvt > 0) {
-    evEl.innerText = `${diffEvt} 回合後會發生${eventName}`;
+    evEl.innerText = `${diffEvt} 回合後會發生${currentEvent.name}`;
   } else if (diffEvt === 0) {
-    evEl.innerText = `本回合會發生${eventName}`;
+    evEl.innerText = `本回合會發生${currentEvent.name}`;
   } else {
     evEl.innerText = '';
   }
