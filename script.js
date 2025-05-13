@@ -209,6 +209,7 @@ function restartGame() {
   document.getElementById('hand').innerHTML = '手牌（建築）';
 
   // 更新 UI
+  scheduleNextEvent(currentRound);  // ← 新增：重排新一局的事件
   updateRoundDisplay();
   updateResourceDisplay();
   updateStageBar();
@@ -1531,6 +1532,7 @@ function updateTechTree() {
 window.onload = () => {
   // 每次重新載入或重開，先生成一次地塊
   initialTileTypes = generateInitialTileTypes();
+  scheduleNextEvent(currentRound);    // ← 新增：排定第一個事件
 
   // 道具選擇 Modal 的確認按鈕
   document.getElementById('confirm-item-btn').onclick = () => {
