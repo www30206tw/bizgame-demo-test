@@ -1585,6 +1585,44 @@ document.getElementById('event-result-close-btn').onclick = () => {
   // （把原本 endTurnBtn.onclick 裡在事件之後的程式碼抽到一支 helper 裡呼叫即可）
 };
 
+// 新增：把「正常的回合結束流程」抽成一支函式
+function finishEndTurn() {
+  // 1. 加回合收益
+  currentGold += roundRevenue;
+  updateResourceDisplay();
+
+  // 2. 扣款、勝利/失敗判斷 (複製原本 endTurnBtn.onclick 裡的這段)
+  if (paymentSchedule[currentRound]) {
+    const cost = paymentSchedule[currentRound];
+    if (currentGold < cost) {
+      // 原本那些敗北訊息……
+      showEndScreen(msg);
+      return;
+    }
+    currentGold -= cost;
+    updateResourceDisplay();
+    showModal('成功支付金幣!');
+    if (currentRound === 22) { showEndScreen('勝利!!'); return; }
+  }
+
+  // 3. 回合 +1
+  currentRound++;
+  updateRoundDisplay();
+
+  // 4. 道具冷卻倒數（如果有）
+  if (selectedItem && itemCooldown > 0) {
+    itemCooldown--;
+    updateItemDisplay();
+  }
+
+  // 5. 重置撤銷
+  lastPlacement = null;
+  document.getElementById('undo-btn').disabled = true;
+
+  // 6. 下一輪抽卡
+  startDrawPhase();
+}
+
 // window.onload 初始化
 window.onload = () => {
   // 每次重新載入或重開，先生成一次地塊
@@ -1698,93 +1736,32 @@ window.onload = () => {
   // ─ 綁定科技樹 Modal 開關 ─
   document.getElementById('tech-button').onclick    = showTechModal;
   document.getElementById('close-tech-btn').onclick = hideTechModal;
-  endTurnBtn.onclick = () => {
-  // —— 如果有道具且冷卻歸零，先跳確認框 —— 
-    if (selectedItem && itemOnCooldown === 0) {
-      const ok = confirm('目前還有可使用的道具，是否結束回合？');
-      if (!ok) return;  // 取消結束回合，留在本回合
-    }
-  // 1. 直接把「回合收益」加給玩家
-  currentGold += roundRevenue;
-  updateResourceDisplay();
-  // 2. 更新 UI（金幣 & 回合收益）
-  if (paymentSchedule[currentRound]) {
-      const cost = paymentSchedule[currentRound];
-      if (currentGold < cost) {
-        // 根據當前回合顯示不同的失敗訊息
-      let msg = '';
-      if (currentRound === 5)      msg = '至少也要付一點錢吧●–●!';
-      else if (currentRound === 10) msg = '下一把會更好>_<';
-      else if (currentRound === 16) msg = '下一把會更好>_<';
-      else if (currentRound === 22) msg = '就差一點了，再努力一下 O口O';
-      else                          msg = '遊戲結束';
-      showEndScreen(msg);
-      return;
-      }
-      // 扣款
-      currentGold -= cost;
-      updateResourceDisplay();
-
-      showModal('成功支付金幣!');
-      // 第16回合支付後即勝利
-      if (currentRound === 22) {
-        showEndScreen('勝利!!');
-        return;
-      }
-    }
-
-  // 如果到事件回合
-  if (currentRound === nextEventRound) {
-    // 先更新左上角倒數文字（diffEvt===0）
-    updateStageBar();
-    showEvent();               // 改這裡
-    return;                    // 中斷，等玩家抽完骰子才進下一回
-  }
-
-  // 3. 回合 +1 並更新顯示
-  currentRound++;
-  updateRoundDisplay();
-  updateStageBar();
-    
-  // 4.道具冷卻倒數
-  if (selectedItem && itemOnCooldown>0) {
-    itemOnCooldown--;
-    if (itemOnCooldown===0) {
-      document.getElementById('item-icon').classList.remove('cooldown');
-    }
-    updateItemCooldownDisplay();
-  }
-    
-  // 5. 開始下一輪抽卡
-  // 開始新回合時，清除撤銷記錄
-  lastPlacement = null;
-  document.getElementById('undo-btn').disabled = true;
-  startDrawPhase();
-};
-
-  // 監聽「重新開始」按鈕
-  document.getElementById('restartBtn').onclick = restartGame;
-  // 監聽 Enter 鍵重啟（只在 end-screen 顯示時觸發）
-  document.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && document.getElementById('end-screen').style.display === 'flex') {
-    restartGame();
-  }
-});
   
-  document.getElementById('refresh-btn').onclick = refreshCards;
-};
+  endTurnBtn.onclick = () => {
+    // —— 1. 如果有道具可用，跳確認 —— 
+    if (selectedItem && itemCooldown === 0) {
+      if (!confirm('目前還有可使用的道具，是否結束回合？')) return;
+    }
+ 
+    // —— 2. 事件回合檢查 —— 
+    if (currentRound === nextEventRound) {
+      // 更新右上倒數文字為「本回合會發生 XXX 事件」
+      updateStageBar();
+      // 顯示事件選擇介面
+      showEvent();
+      return;  // 中斷，暫不執行正常結束流程
+    }
+ 
+    // —— 3. 正常結束流程 —— 
+    finishEndTurn();
+  };
 
-function scheduleNextEvent(fromRound) {
-  const paymentRounds = Object.keys(paymentSchedule).map(n=>+n);
-  let candidate;
-  do {
-    candidate = fromRound + Math.floor(Math.random()*4) + 3;  // +3~6
-  } while (paymentRounds.includes(candidate));
-  nextEventRound = candidate;
-  // 新增：挑一個事件
-  currentEvent = eventDefinitions[Math.floor(Math.random()*eventDefinitions.length)];
-  eventName = currentEvent.name;
-}
+  document.getElementById('event-result-close-btn').onclick = () => {
+    document.getElementById('event-result-modal').style.display = 'none';
+    scheduleNextEvent(currentRound);
+    // 事件做完後，再執行正常的回合結束流程
+    finishEndTurn();
+  };
 
 
 document.addEventListener('drag', e => {
