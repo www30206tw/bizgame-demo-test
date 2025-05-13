@@ -1110,7 +1110,9 @@ function skipDraw(){
   document.getElementById('draw-section').style.display='none';
 }
 function confirmDraw(){
-  const selected = Array.from(document.querySelectorAll('.card.selected'));
+  const selected = Array.from(
+    document.querySelectorAll('#card-pool .card.selected')
+  );
    // 嚴格要求「等於 2 張」才能通過
   if (selected.length !== 2) {
     alert('請選擇兩張卡！');
