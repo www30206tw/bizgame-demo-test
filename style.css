@@ -514,3 +514,10 @@ body {
   font-size: 12px;
   font-weight: bold;
 }
+
+/* 回合結束按鈕 disabled 時灰階並禁止點擊 */
+#end-turn-btn:disabled,
+.btn-end:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
