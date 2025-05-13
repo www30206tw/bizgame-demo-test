@@ -130,5 +130,24 @@
     <button id="restartBtn" type="button">重新開始遊戲</button>
   </div>
 
+    <!-- 事件觸發介面 -->
+  <div id="event-modal" class="warning-modal" style="display:none; z-index:1005;">
+    <div class="warning-content">
+      <h2 id="event-title">事件名稱</h2>
+      <div id="event-options" style="text-align:left; margin:12px 0;">
+        <!-- 這裡列出「1–2 → 本回合所有荒原建築產出為0」等三行 -->
+      </div>
+      <button id="roll-event-btn">抽取</button>
+    </div>
+  </div>
+
+  <!-- 事件結果顯示介面 -->
+  <div id="event-result-modal" class="warning-modal" style="display:none; z-index:1006;">
+    <div class="warning-content">
+      <p id="event-result-text">擲骰結果</p>
+      <button id="event-result-close-btn">確定</button>
+    </div>
+  </div>
+
   </body>
 </html>
