@@ -363,7 +363,7 @@ function calculateRevenue(map) {
     if(!t.buildingPlaced||t.type!=='slum'||t.buildingLabel!=='貧民窟') return;
     const adjCount = t.adjacency
       .map(id=>clone.find(x=>x.id===id))
-      .filter(x=>x&&x.buildingPlaced).length;
+      .filter(x=>x&&x.buildingPlaced&&x.buildingLabel==='貧民窟').length;
     t.buildingProduce += Math.min(adjCount,5);
   });
 
@@ -561,7 +561,7 @@ function simulateTileDiffs(tileId) {
     if (!t.buildingPlaced || t.type !== 'slum' || t.buildingLabel !== '貧民窟') return;
     const adjCount = t.adjacency
       .map(id => cloneMap.find(x => x.id === id))
-      .filter(x => x && x.buildingPlaced).length;
+      .filter(x => x && x.buildingPlaced && x.buildingLabel === '貧民窟').length;
     t.buildingProduce += Math.min(adjCount, 5);
   });
 
@@ -1223,7 +1223,8 @@ function recalcRevenueFromScratch(){
     if(!t.buildingPlaced||t.type!=='slum'||t.buildingLabel!=='貧民窟') return;
     const adjCount = t.adjacency.filter(id=>{
       const nt=tileMap.find(x=>x.id===id);
-      return nt&&nt.buildingPlaced;
+      // 只計算標籤也是「貧民窟」的相鄰建築
+    return nt && nt.buildingPlaced && nt.buildingLabel === '貧民窟';
     }).length;
     t.buildingProduce += Math.min(adjCount,5);
   });
