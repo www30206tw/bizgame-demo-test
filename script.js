@@ -17,7 +17,6 @@ let itemOnCooldown = 0;
 let itemPicked = false;  // 是否已選過一次
 let nextEventRound = null;
 let currentEvent = null;
-let eventName = 'Y事件';   // 暂用占位，后续再动态替换
 
 // —— 新增道具系統變數 —— 
 const itemDefinitions = [
