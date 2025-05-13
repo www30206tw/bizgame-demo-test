@@ -1322,34 +1322,28 @@ function recalcRevenueFromScratch(){
   }
   });
 
-   // —— 新增：水力资源道具生效 —— 
-  tileMap.forEach(t => {
-    if (window.hydroActive && t.type === 'river') {
-      t.buildingProduce *= 2;
-    }
-  });
-  // 用完就清掉 flag，下一回合失效
-  window.hydroActive = false;
-  
-  // 5. 累加
+  // 5. 累加（把水力資源的翻倍只臨時套用，不改 buildingProduce）
+  const wuluDef  = techDefinitions['廢物利用'];
+  const dijiaDef = techDefinitions['地價升值'];
   tileMap.forEach(t => {
     if (!t.buildingPlaced) return;
-    // 先拿原本計算好的建築產出
     let val = t.buildingProduce;
-    // 「廢物利用」：荒原地塊每等級 + perLevel 金幣
-    // 「地價升值」：僅對繁華區地塊，每等級 + perLevel 金幣
-    const wuluDef = techDefinitions['廢物利用'];
-    const dijiaDef = techDefinitions['地價升值'];
-    
-    if (wuluDef && t.type === 'wasteland') {
-    val += wuluDef.perLevel * wuluDef.count;
+    // 水力資源：河流地塊當回合產出翻倍
+    if (window.hydroActive && t.type === 'river') {
+      val *= 2;
     }
-    
+    // 科技加成
+    if (wuluDef && t.type === 'wasteland') {
+      val += wuluDef.perLevel * wuluDef.count;
+    }
     if (dijiaDef && t.type === 'city') {
-    val += dijiaDef.perLevel * dijiaDef.count;
+      val += dijiaDef.perLevel * dijiaDef.count;
     }
     total += val;
   });
+  // 用完就清掉 flag，下一回合失效
+  window.hydroActive = false;
+
   roundRevenue = total;
   updateResourceDisplay();
 }
