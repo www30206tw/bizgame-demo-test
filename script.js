@@ -1658,6 +1658,13 @@ window.onload = () => {
     // 選完才開始抽卡
     startDrawPhase();
    };
+  // **在這裡新增地圖／UI 的初始化**
+  tileMap = createTileMap31();
+  computeAdj();
+  initMapArea();
+  updateRoundDisplay();
+  updateResourceDisplay();
+  updateStageBar();
  };
 
   // DOM 參考
@@ -1733,16 +1740,6 @@ window.onload = () => {
      lastPlacement = null;
      undoBtn.disabled = true;
    };  // ← 这里一定要加上这一行，完整关闭 undoBtn.onclick 的大括号
- 
-   // 建立並渲染地圖
-   tileMap = createTileMap31();
-   computeAdj();
-   initMapArea();
-
-  // 初始顯示
-  updateRoundDisplay();
-  updateResourceDisplay();
-  updateStageBar();
 
   // 事件
   startBtn.onclick = ()=>{ startScreen.style.display='none'; startDrawPhase(); };
