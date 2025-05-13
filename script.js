@@ -127,7 +127,7 @@ const labelEffectDesc = {
   "繁華區":"蓋在繁華區時+4",
   "貧民窟":"相鄰貧民窟建築每座+1",
   "河流":"蓋在河流時+3",
-  "荒原":"當周圍沒有其他建築時，產出+2"
+  "荒原":"蓋在荒原且當周圍沒有其他建築時，產出+2"
 };
 
 // 在 labelEffectDesc 之後，加入
@@ -334,16 +334,17 @@ function calculateRevenue(map) {
     } else if (t.type==='slum' && t.buildingLabel==='貧民窟') {
       pv += 1;
     }
-    if (t.buildingLabel==='荒原') {
-  const hasNeighbor = t.adjacency.some(id => {
-    const nt = clone.find(x=>x.id===id);
-    return nt && nt.buildingPlaced;
+    // 僅在荒原地塊上生效，且無相鄰建築
+  if (t.buildingLabel === '荒原' && t.type === 'wasteland') {
+    const hasNeighbor = t.adjacency.some(id => {
+      const nt = cloneMap.find(x => x.id === id);
+      return nt && nt.buildingPlaced;
     });
-  if (!hasNeighbor) {
-    pv += 2;
+    if (!hasNeighbor) {
+      pv += 2;
     }
   }
-    t.buildingProduce = pv;
+  t.buildingProduce = pv;
   });
 
   // slum 群聚
@@ -536,16 +537,17 @@ function simulateTileDiffs(tileId) {
     } else if (t.type === 'river') {
       pv += -1 + (t.buildingLabel === '河流' ? 3 : 0);
     }
-    if (t.buildingLabel==='荒原') {
-  const hasNeighbor = t.adjacency.some(id => {
-    const nt = clone.find(x=>x.id===id);
-    return nt && nt.buildingPlaced;
+   // 僅在荒原地塊上生效，且無相鄰建築
+  if (t.buildingLabel === '荒原' && t.type === 'wasteland') {
+    const hasNeighbor = t.adjacency.some(id => {
+      const nt = cloneMap.find(x => x.id === id);
+      return nt && nt.buildingPlaced;
     });
-  if (!hasNeighbor) {
-    pv += 2;
+    if (!hasNeighbor) {
+      pv += 2;
     }
   }
-    t.buildingProduce = pv;
+  t.buildingProduce = pv;
   });
 
   //  3.2 slum 群聚
@@ -1208,8 +1210,9 @@ function recalcRevenueFromScratch(){
       pv-=1;
       if(t.buildingLabel==='河流') pv+=3;
     }
-    // 新增：荒原標籤效果：當周圍沒有其他建築時，產出 +2
-  if (t.buildingLabel === '荒原') {
+    
+    // 調整：僅在荒原地塊上，且周圍無建築時，產出 +2
+  if (t.buildingLabel === '荒原' && t.type === 'wasteland') {
   const hasNeighbor = t.adjacency.some(id => {
     const nt = tileMap.find(x => x.id === id);
     return nt && nt.buildingPlaced;
