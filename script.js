@@ -31,19 +31,50 @@ const eventDefinitions = [
     id: 'wastelandSandstorm',
     name: '荒原沙暴',
     outcomes: [
-      { range: [1,2], text: '本回合所有荒原建築產出為0',
+      { range: [1,30], text: '本回合所有荒原地塊上的建築產出為0',
         effect: () => { window.sandstormActive = true; } },
-      { range: [3,4], text: '立即獲得50金幣',
-        effect: () => { currentGold += 50; updateResourceDisplay(); } },
-      { range: [5,6], text: '立即獲得2張隨機的荒原建築',
+      { range: [31,70], text: '立即獲得30金幣',
+        effect: () => { currentGold += 30; updateResourceDisplay(); } },
+      { range: [71,100], text: '立即獲得1張隨機的荒原建築',
         effect: () => {
-          for (let i=0; i<2; i++) {
-            const pool = cardPoolData.filter(c=>c.label==='荒原'&&c.type==='building');
-            const pick = pool[Math.floor(Math.random()*pool.length)];
-            document.getElementById('hand').appendChild(createBuildingCard(pick));
-          }
+          const pool = cardPoolData.filter(c=>c.label==='荒原'&&c.type==='building');
+          const pick = pool[Math.floor(Math.random()*pool.length)];
+          document.getElementById('hand').appendChild(createBuildingCard(pick));
         }
       }
+    ]
+  },
+  // 新增「洪水氾濫」事件
+  {
+    id: 'flood',
+    name: '洪水氾濫',
+    outcomes: [
+      { range: [1,30], text: '隨機摧毀一個河流地塊上的建築（若無則無效果）',
+        effect: () => {
+          const riverTiles = tileMap.filter(t=>t.type==='river'&&t.buildingPlaced);
+          if (!riverTiles.length) return;
+          const t = riverTiles[Math.floor(Math.random()*riverTiles.length)];
+          document.querySelector(`[data-tile-id="${t.id}"]`).innerHTML = '?';
+          t.buildingPlaced = false;
+          recalcRevenueFromScratch();
+        }
+      },
+      { range: [31,70], text: '隨機一個與河流地塊相鄰的地塊，變化為河流地塊',
+        effect: () => {
+          // 蒐集所有 river 鄰接的 tile id
+          const neigh = new Set();
+          tileMap.filter(t=>t.type==='river').forEach(r=>{
+            r.adjacency.forEach(id=>neigh.add(id));
+          });
+          const candidates = [...neigh].map(id=>tileMap.find(t=>t.id===id));
+          const pick = candidates[Math.floor(Math.random()*candidates.length)];
+          pick.type = 'river';
+          document.querySelector(`[data-tile-id="${pick.id}"]`)
+                  .className = `hex-tile river-tile`;
+        }
+      },
+      { range: [71,100], text: '本回合所有河流地塊上的建築產出加倍',
+        effect: () => { window.floodActive = true; } }
     ]
   }
 ];
@@ -1019,16 +1050,16 @@ function updateStageBar() {
     cdEl.innerText = '';
   }
 
-  // 新增：事件倒數計時
-  const evEl = document.getElementById('event-countdown');
-  const diffEvt = nextEventRound - currentRound;
-  if (diffEvt > 0) {
-    evEl.innerText = `${diffEvt} 回合後會發生${currentEvent.name}`;
-  } else if (diffEvt === 0) {
-    evEl.innerText = `本回合會發生${currentEvent.name}`;
-  } else {
-    evEl.innerText = '';
-  }
+  // 在 updateStageBar() 裡，改成用 innerHTML 並包一層 <span class="event-name">
+   const evEl = document.getElementById('event-countdown');
+   const diffEvt = nextEventRound - currentRound;
+   if (diffEvt > 0) {
+     evEl.innerHTML = `${diffEvt} 回合後會發生 <span class="event-name">${currentEvent.name}</span>`;
+   } else if (diffEvt === 0) {
+     evEl.innerHTML = `本回合會發生 <span class="event-name">${currentEvent.name}</span>`;
+   } else {
+     evEl.innerHTML = '';
+   }
 }
 
 // 建築卡牌生成
@@ -1431,10 +1462,15 @@ function recalcRevenueFromScratch(){
      }
     if (dijiaDef && t.type === 'city')     val += dijiaDef.perLevel * dijiaDef.count;
     total += val;
+     // 洪水氾濫：河流地塊當回合產出翻倍
+    if (window.floodActive && t.type === 'river') {
+     val *= 2;
+      }
   });
   // 清除本回合 flag
   window.sandstormActive = false;
   window.hydroActive     = false;
+  window.floodActive     = false;  // <-- 清掉 floodActive
 
   roundRevenue = total;
   updateResourceDisplay();
@@ -1600,7 +1636,7 @@ function updateTechTree() {
 
 // 玩家按「抽取」
 document.getElementById('roll-event-btn').onclick = () => {
-  const roll = Math.floor(Math.random()*6) + 1;
+  const roll = Math.floor(Math.random() * 100) + 1; 
   const outcome = currentEvent.outcomes.find(o => roll >= o.range[0] && roll <= o.range[1]);
   // 先關閉事件選項
   document.getElementById('event-modal').style.display = 'none';
