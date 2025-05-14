@@ -521,3 +521,9 @@ body {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* 讓事件名稱更顯眼 */
+.event-name {
+  color: #e74c3c;    /* 你可以換其他醒目的顏色 */
+  font-weight: bold;
+}
