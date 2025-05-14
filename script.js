@@ -1776,6 +1776,8 @@ window.onload = () => {
   document.getElementById('event-result-close-btn').onclick = () => {
     document.getElementById('event-result-modal').style.display = 'none';
     scheduleNextEvent(currentRound);
+    // 重新計算本回合產出，讓沙暴效果生效
+    recalcRevenueFromScratch();
     // 事件做完後，再執行正常的回合結束流程
     finishEndTurn();
   };
