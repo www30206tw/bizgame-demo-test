@@ -1418,8 +1418,10 @@ function recalcRevenueFromScratch(){
     if (window.hydroActive && t.type === 'river') {
       val *= 2;
     }
-    // 科技加成
-    if (wuluDef  && t.type === 'wasteland') val += wuluDef.perLevel * wuluDef.count;
+    / 科技加成（沙暴時不生效）
+     if (wuluDef && t.type === 'wasteland' && !window.sandstormActive) {
+       val += wuluDef.perLevel * wuluDef.count;
+     }
     if (dijiaDef && t.type === 'city')     val += dijiaDef.perLevel * dijiaDef.count;
     total += val;
   });
@@ -1629,10 +1631,10 @@ function finishEndTurn() {
   updateRoundDisplay();
 
   // 4. 道具冷卻倒數（如果有）
-  if (selectedItem && itemCooldown > 0) {
-    itemCooldown--;
-    updateItemDisplay();
-  }
+  if (selectedItem && itemOnCooldown > 0) {
+     itemOnCooldown--;
+     updateItemCooldownDisplay();
+   }
 
   // 5. 重置撤銷
   lastPlacement = null;
@@ -1756,7 +1758,7 @@ window.onload = () => {
   
   endTurnBtn.onclick = () => {
     // —— 1. 如果有道具可用，跳確認 —— 
-    if (selectedItem && itemCooldown === 0) {
+    if (selectedItem && itemOnCooldown === 0) {
       if (!confirm('目前還有可使用的道具，是否結束回合？')) return;
     }
  
