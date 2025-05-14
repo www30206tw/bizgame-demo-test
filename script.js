@@ -1679,17 +1679,18 @@ document.getElementById('roll-event-btn').onclick = () => {
      .find(o => finalRoll >= o.range[0] && finalRoll <= o.range[1]);
   // 先關閉事件選項
   document.getElementById('event-modal').style.display = 'none';
-  document.getElementById('event-result-text').innerText =
-    `擲骰：${roll} → ${outcome.text}`;
-  // 執行效果
-  outcome.effect();
-  /// 顯示結果：94 (84+10) → 效果文字
+  
+  // 顯示結果：94 (84+10) → 效果文字
    let txt = `擲骰：${finalRoll}`;
    if (eventBonusUsed) {
      txt += ` (${baseRoll}+${eventBonus})`;
    }
    txt += ` → ${outcome.text}`;
    document.getElementById('event-result-text').innerText = txt;
+
+  // 執行效果
+  outcome.effect();
+  // 打開“事件结果”窗口
   document.getElementById('event-result-modal').style.display = 'flex';
 };
 
