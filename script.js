@@ -991,15 +991,16 @@ function initMapArea(){
     }
   });
 
-    hex.addEventListener('drop', e => {
-    e.preventDefault();
-    const cid = e.dataTransfer.getData('cardId');
-    const card = document.querySelector(`[data-card-id="${cid}"]`);
-    if (!card) return;
-    e.preventDefault();
-    clearPreviews();
-    showPreviews(hex.dataset.tileId);
-  });
+        hex.addEventListener('drop', e => {
+      e.preventDefault();
+      const cid = e.dataTransfer.getData('cardId');
+      const card = document.querySelector(`[data-card-id="${cid}"]`);
+      if (!card) return;
+      clearPreviews();
+      // 先执行真正的放置
+      placeBuildingOnTile(t, card);
+      // 然后（可选）再刷新预览或其他效果
+    });
 
      mapArea.appendChild(hex);
   });
