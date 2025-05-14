@@ -240,6 +240,13 @@ function restartGame() {
   warningNextRoundShown = false;
   lastPlacement = null;
 
+  // —— 新增：重置道具系統 —— 
+  selectedItem    = null;
+  itemOnCooldown  = 0;
+  itemPicked      = false;
+  document.getElementById('item-icon-container').innerHTML = '';
+  document.getElementById('item-countdown').innerText = '';
+
   // 新增：重置科技樹中的已用次數，並更新畫面
   Object.values(techDefinitions).forEach(def => def.count = 0);
   updateTechTree();
