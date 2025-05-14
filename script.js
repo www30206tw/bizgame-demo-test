@@ -1673,8 +1673,6 @@ document.getElementById('roll-event-btn').onclick = () => {
   }
   const outcome = currentEvent.outcomes
     .find(o => roll >= o.range[0] && roll <= o.range[1]);
-  const roll = Math.floor(Math.random() * 100) + 1; 
-  const outcome = currentEvent.outcomes.find(o => roll >= o.range[0] && roll <= o.range[1]);
   // 先關閉事件選項
   document.getElementById('event-modal').style.display = 'none';
   document.getElementById('event-result-text').innerText =
