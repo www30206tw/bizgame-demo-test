@@ -17,6 +17,8 @@ let itemOnCooldown = 0;
 let itemPicked = false;  // 是否已選過一次
 let nextEventRound = null;
 let currentEvent = null;
+let eventBonusUsed = false;
+let eventBonus     = 0;
 
 // —— 新增道具系統變數 —— 
 const itemDefinitions = [
@@ -1632,6 +1634,9 @@ function updateTechTree() {
 }
 
  function showEvent() {
+  eventBonusUsed = false;
+  eventBonus     = 0;
+  document.getElementById('exchange-info').style.display = 'none';
   // 顯示 event-modal
   document.getElementById('event-title').innerText = currentEvent.name;
   const opts = document.getElementById('event-options');
@@ -1640,14 +1645,40 @@ function updateTechTree() {
     opts.innerHTML += `<p>${o.range[0]}–${o.range[1]}：${o.text}</p>`;
   });
   document.getElementById('event-modal').style.display = 'flex';
+  document.getElementById('event-title').querySelector('#event-name-text')
+    .innerText = currentEvent.name;
+  // 換按鈕文字
+  document.getElementById('roll-event-btn').innerText = '擲骰';
+  document.getElementById('exchange-points-btn').innerText = '兌換點數';
+  document.getElementById('event-modal').style.display = 'flex';
 }
+
+document.getElementById('exchange-points-btn').onclick = () => {
+  if (eventBonusUsed) return;               // 已經用過，就直接不做任何事
+  if (currentGold < 20) { alert('金幣不足'); return; }
+  if (confirm('是否消耗20金幣，使擲骰結果+10？')) {
+    currentGold   -= 20;
+    eventBonusUsed = true;                  // 標記已經使用過
+    eventBonus     = 10;                    // 本次事件加成 +10
+    updateResourceDisplay();
+    document.getElementById('exchange-info').style.display = 'block';
+  }
+};
 
 // 玩家按「抽取」
 document.getElementById('roll-event-btn').onclick = () => {
+  let roll = Math.floor(Math.random() * 100) + 1;
+  if (eventBonusUsed) {
+    roll = Math.min(100, roll + eventBonus);
+  }
+  const outcome = currentEvent.outcomes
+    .find(o => roll >= o.range[0] && roll <= o.range[1]);
   const roll = Math.floor(Math.random() * 100) + 1; 
   const outcome = currentEvent.outcomes.find(o => roll >= o.range[0] && roll <= o.range[1]);
   // 先關閉事件選項
   document.getElementById('event-modal').style.display = 'none';
+  document.getElementById('event-result-text').innerText =
+    `擲骰：${roll} → ${outcome.text}`;
   // 執行效果
   outcome.effect();
   // 顯示結果
