@@ -1418,7 +1418,7 @@ function recalcRevenueFromScratch(){
     if (window.hydroActive && t.type === 'river') {
       val *= 2;
     }
-    / 科技加成（沙暴時不生效）
+    // 科技加成（沙暴時不生效）
      if (wuluDef && t.type === 'wasteland' && !window.sandstormActive) {
        val += wuluDef.perLevel * wuluDef.count;
      }
