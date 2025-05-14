@@ -205,6 +205,14 @@ const techDefinitions = {
   '地價升值': { rarity:'稀有', description:'繁華區地塊能力的產出額外', perLevel:2, count:0, max:5 }
 };
 
+// 新增：卡池中每張卡最多 5 張
+let poolCounts = {};
+function initPoolCounts() {
+  cardPoolData.forEach(c => poolCounts[c.name] = 5);
+}
+// 進入遊戲時先初始化一次
+initPoolCounts();
+
 const labelEffectDesc = {
   "繁華區":"蓋在繁華區時+4",
   "貧民窟":"相鄰貧民窟建築每座+1",
@@ -277,6 +285,7 @@ function restartGame() {
   refreshCount = 0;
   warningNextRoundShown = false;
   lastPlacement = null;
+  initPoolCounts();
 
   // —— 新增：重置道具系統 —— 
   selectedItem    = null;
@@ -338,6 +347,7 @@ function drawOneCard(typeConstraint, rarity, excludedSet) {
     c.rarity === rarity &&
     (typeConstraint === 'either' || c.type === typeConstraint) &&
     !excludedSet.has(c.name)
+    && poolCounts[c.name] > 0
     // 排除：科技卡已使用達上限
     && !(c.type==='tech' && techDefinitions[c.name].count >= techDefinitions[c.name].max)                               
   );
@@ -348,6 +358,7 @@ function drawOneCard(typeConstraint, rarity, excludedSet) {
        c.rarity === rarity &&
        c.type === 'building' &&
        !excludedSet.has(c.name)
+       && poolCounts[c.name] > 0                       
      );
      if (fallback.length > 0) {
        const pick2 = fallback[Math.floor(Math.random() * fallback.length)];
@@ -1239,6 +1250,8 @@ function confirmDraw(){
    const hand = document.getElementById('hand');
   selected.forEach(c => {
     const name = c.querySelector('.card-name').innerText;
+    // 扣掉一張卡池數量
+    poolCounts[name]--;
     const type = c.dataset.type;
     if (type === 'tech') {
       // 使用科技卡：計數 +1，更新科技樹
