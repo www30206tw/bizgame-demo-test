@@ -180,6 +180,7 @@ function isSlumLayoutValid(types) {
 
 const cardPoolData = [
   { name:'淨水站', rarity:'普通', label:'河流',     baseProduce:4, specialAbility:'若相鄰地塊有河流地塊，則產出 +1' ,type:'building' },
+  { name: '河畔工坊', rarity: '普通', label: '河流', baseProduce:3, specialAbility: '回合結束時，若此建築在手牌中，則此建築的產出永久+1（最多+7）', type: 'building'},
   { name:'星軌會館', rarity:'稀有', label:'繁華區',  baseProduce:5, specialAbility:'沒有任何貧民窟建築相臨時，產出額外+3' ,type:'building' },
   { name:'摩天坊', rarity:'普通', label:'繁華區', baseProduce:5 ,type:'building' },
   { name:'集貧居', rarity:'普通', label:'貧民窟', baseProduce:4 ,type:'building' },
@@ -251,6 +252,28 @@ const paymentSchedule = { 5:180, 10:640, 16:1250 ,22:2000};
 let tileMap = [];
 
 // 工具函式
+
+/**
+ * 把手牌中所有「河畔工坊」的产出 +1（最多 +7），
+ * 并同步更新卡面上的数字。
+ */
+function handleRiversideWorkshopUpgrade() {
+  const SPECIAL = '河畔工坊';
+  document.querySelectorAll('#hand .card').forEach(card => {
+    const name = card.querySelector('.card-name').innerText;
+    if (name !== SPECIAL) return;
+    let cnt = parseInt(card.dataset.upgradeCount || '0');
+    if (cnt >= 7) return;
+    // 增产
+    cnt++;
+    card.dataset.upgradeCount = cnt;
+    const oldP = parseInt(card.dataset.produce);
+    const newP = oldP + 1;
+    card.dataset.produce = newP;
+    // 更新卡面上的数字
+    card.querySelector('.card-gold-output').innerText = newP;
+  });
+}
 
 // 顯示「遊戲結束」畫面
 function showEndScreen(msg) {
@@ -1085,6 +1108,10 @@ function updateStageBar() {
 // 建築卡牌生成
 function createBuildingCard(info){
   const card = document.createElement('div');
+  // 如果是「河畔工坊」，给它一个升级计数
+  if (info.name === '河畔工坊') {
+    card.dataset.upgradeCount = 0;
+  }
   // 新增：記錄卡片類型 (building 或 tech)
   card.dataset.type = info.type;
   card.className = 'card';
@@ -1718,6 +1745,9 @@ document.getElementById('event-result-close-btn').onclick = () => {
 
 // 新增：把「正常的回合結束流程」抽成一支函式
 function finishEndTurn() {
+  // —— 新增：先给「河畔工坊」升级一次（手牌中每张最多 +7） —— 
+  handleRiversideWorkshopUpgrade();
+  
   // 1. 加回合收益
   currentGold += roundRevenue;
   updateResourceDisplay();
