@@ -1662,25 +1662,34 @@ document.getElementById('exchange-points-btn').onclick = () => {
     eventBonus     = 10;                    // 本次事件加成 +10
     updateResourceDisplay();
     document.getElementById('exchange-info').style.display = 'block';
+    // 隱藏「兌換點數」按鈕，確保一次事件只能用一次
+    document.getElementById('exchange-points-btn').style.display = 'none';
   }
 };
 
 // 玩家按「抽取」
 document.getElementById('roll-event-btn').onclick = () => {
-  let roll = Math.floor(Math.random() * 100) + 1;
-  if (eventBonusUsed) {
-    roll = Math.min(100, roll + eventBonus);
-  }
-  const outcome = currentEvent.outcomes
-    .find(o => roll >= o.range[0] && roll <= o.range[1]);
+  // 先擲一次 1~100，原始值
+   const baseRoll  = Math.floor(Math.random() * 100) + 1;
+   // 如果用了兌換，最終點數就是 baseRoll + eventBonus（上限100）
+   const finalRoll = eventBonusUsed
+     ? Math.min(100, baseRoll + eventBonus)
+     : baseRoll;
+   const outcome = currentEvent.outcomes
+     .find(o => finalRoll >= o.range[0] && finalRoll <= o.range[1]);
   // 先關閉事件選項
   document.getElementById('event-modal').style.display = 'none';
   document.getElementById('event-result-text').innerText =
     `擲骰：${roll} → ${outcome.text}`;
   // 執行效果
   outcome.effect();
-  // 顯示結果
-  document.getElementById('event-result-text').innerText = `擲骰：${roll} → ${outcome.text}`;
+  /// 顯示結果：94 (84+10) → 效果文字
+   let txt = `擲骰：${finalRoll}`;
+   if (eventBonusUsed) {
+     txt += ` (${baseRoll}+${eventBonus})`;
+   }
+   txt += ` → ${outcome.text}`;
+   document.getElementById('event-result-text').innerText = txt;
   document.getElementById('event-result-modal').style.display = 'flex';
 };
 
