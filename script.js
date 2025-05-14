@@ -1537,21 +1537,28 @@ function useItem(){
 
 function updateItemCooldownDisplay(){
   const ico = document.getElementById('item-icon');
-   // 先全清除：舊的倒數與「可使用」
-   ico?.querySelectorAll('.cooldown-overlay, .item-usable').forEach(el=>el.remove());
-   if (!ico) return;
-   if (itemOnCooldown > 0) {
-     const ov = document.createElement('div');
-     ov.className = 'cooldown-overlay';
-     ov.innerText = itemOnCooldown;
-     ico.appendChild(ov);
-   } else {
-     // 冷卻結束：顯示「(可使用)」
-     const u = document.createElement('div');
-     u.className = 'item-usable';
-     u.innerText = '(可使用)';
-     ico.appendChild(u);
-   }
+  // 先移除舊的倒數文字與提示
+  ico?.querySelectorAll('.cooldown-overlay, .item-usable').forEach(el => el.remove());
+  if (!ico) return;
+
+  if (itemOnCooldown > 0) {
+    // 加回 .cooldown 讓它半透明
+    ico.classList.add('cooldown');
+
+    const ov = document.createElement('div');
+    ov.className = 'cooldown-overlay';
+    ov.innerText = itemOnCooldown;
+    ico.appendChild(ov);
+
+  } else {
+    // 冷卻結束：移除半透明 class，並顯示可用提示
+    ico.classList.remove('cooldown');
+
+    const u = document.createElement('div');
+    u.className = 'item-usable';
+    u.innerText = '(可使用)';
+    ico.appendChild(u);
+  }
 }
 
 // 顯示科技樹 Modal
@@ -1623,9 +1630,15 @@ function finishEndTurn() {
   if (paymentSchedule[currentRound]) {
     const cost = paymentSchedule[currentRound];
     if (currentGold < cost) {
-      // 原本那些敗北訊息……
-      showEndScreen(msg);
-      return;
+    // 根據當前回合顯示不同的失敗訊息
+    let msg = '';
+    if (currentRound === 5)      msg = '至少也要付一點錢吧●–●!';
+    else if (currentRound === 10) msg = '下一把會更好>_<';
+    else if (currentRound === 16) msg = '下一把會更好>_<';
+    else if (currentRound === 22) msg = '就差一點了，再努力一下 O口O';
+    else                          msg = '遊戲結束';
+    showEndScreen(msg);
+    return;
     }
     currentGold -= cost;
     updateResourceDisplay();
