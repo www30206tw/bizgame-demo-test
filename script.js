@@ -412,6 +412,8 @@ function createTileMap31(){
         // 從 initialTileTypes 拿對應位置的類型
         type: initialTileTypes[id - 1],
         buildingProduce: 0,
+        buildingBaseProduce: 0,    // ← 新增
+        permDeductCount: 0,         // ← 新增：已永久減少次數
         buildingPlaced: false,
         slumBonusGranted: false,
         adjacency: [],
@@ -1161,7 +1163,7 @@ function createBuildingCard(info){
   draggingCardInfo = {
      name:             info.name,
      type:             info.type,
-     baseProduce:      info.baseProduce,
+     baseProduce:      parseInt(card.dataset.produce),
      label:            info.label,
      specialAbility:   info.specialAbility || '',
      rarity:           info.rarity
@@ -1277,9 +1279,11 @@ function confirmDraw(){
    const hand = document.getElementById('hand');
   selected.forEach(c => {
     const name = c.querySelector('.card-name').innerText;
-    // 扣掉一張卡池數量
-    poolCounts[name]--;
     const type = c.dataset.type;
+    // 扣掉一張卡池數量
+    if (type === 'building') {
+    poolCounts[name]--;
+    }
     if (type === 'tech') {
       // 使用科技卡：計數 +1，更新科技樹
       techDefinitions[name].count = Math.min(
@@ -1456,12 +1460,6 @@ function recalcRevenueFromScratch(){
          x.buildingProduce++;
        }
      });
-   }
-  // 焚料方艙：偶數回合產出−1，下限4
-   if(t.buildingName==='焚料方艙'){
-     if(currentRound % 2 === 0){
-       t.buildingProduce = Math.max(t.buildingProduce - 1, 4);
-     }
    }
   // 灣岸輸能站：若不在河流地塊，每回合 −2
   if (t.buildingName === '灣岸輸能站' && t.type !== 'river') {
@@ -1675,6 +1673,8 @@ function updateTechTree() {
 
  function showEvent() {
   eventBonusUsed = false;
+  document.getElementById('exchange-points-btn').style.display = 'inline-block';
+  document.getElementById('exchange-info').style.display = 'none';
   eventBonus     = 0;
   document.getElementById('exchange-info').style.display = 'none';
   // 顯示 event-modal
@@ -1745,6 +1745,18 @@ document.getElementById('event-result-close-btn').onclick = () => {
 
 // 新增：把「正常的回合結束流程」抽成一支函式
 function finishEndTurn() {
+  //  新增：「焚料方艙」動態減 1
+    if (currentRound % 2 === 0) {
+      tileMap.forEach(t => {
+        if (t.buildingName === '焚料方艙' && t.permDeductCount < 4) {
+          t.buildingBaseProduce -= 1;
+          t.permDeductCount += 1;
+          // 同步更新畫面上若有對應的地塊懸浮或手牌顯示
+          //（放在 tile-mouseenter popup 裡讀 t.buildingBaseProduce 即可自動顯示）
+        }
+      });
+    }
+  
   // —— 新增：先给「河畔工坊」升级一次（手牌中每张最多 +7） —— 
   handleRiversideWorkshopUpgrade();
   
