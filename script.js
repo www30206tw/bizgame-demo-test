@@ -982,10 +982,23 @@ function initMapArea(){
 
     // 拖过地块时，显示对应预览
     hex.addEventListener('dragover', e => {
-  if (!draggingCardInfo) return;
-  e.preventDefault();
-  clearPreviews();
-  showPreviews(hex.dataset.tileId);
+    e.preventDefault();
+  
+    // 如果正在拖的是手牌，就顯示預覽
+    if (draggingCardInfo) {
+      clearPreviews();
+      showPreviews(hex.dataset.tileId);
+    }
+  });
+
+    hex.addEventListener('drop', e => {
+    e.preventDefault();
+    const cid = e.dataTransfer.getData('cardId');
+    const card = document.querySelector(`[data-card-id="${cid}"]`);
+    if (!card) return;
+    e.preventDefault();
+    clearPreviews();
+    showPreviews(hex.dataset.tileId);
   });
 
      mapArea.appendChild(hex);
