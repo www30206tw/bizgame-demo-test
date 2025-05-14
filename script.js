@@ -1764,7 +1764,7 @@ window.onload = () => {
      undoBtn.disabled = true;
    };  // ← 这里一定要加上这一行，完整关闭 undoBtn.onclick 的大括号
 
-  // 事件
+   // ── 綁定「開始遊戲」與「Enter 鍵」 ──
   startBtn.onclick = ()=>{ startScreen.style.display='none'; startDrawPhase(); };
   document.addEventListener('keydown', e=> {
     if(e.key==='Enter'&&startScreen.style.display!=='none'){
@@ -1772,6 +1772,11 @@ window.onload = () => {
       startDrawPhase();
     }
   });
+
+  // ── 綁定「重新開始遊戲」按鈕 ──
+  const restartBtn = document.getElementById('restartBtn');
+  restartBtn.onclick = restartGame;
+
   // ─ 綁定科技樹 Modal 開關 ─
   document.getElementById('tech-button').onclick    = showTechModal;
   document.getElementById('close-tech-btn').onclick = hideTechModal;
