@@ -61,13 +61,18 @@ const eventDefinitions = [
       },
       { range: [31,70], text: '隨機一個與河流地塊相鄰的地塊，變化為河流地塊',
         effect: () => {
-          // 蒐集所有 river 鄰接的 tile id
+          // 1)蒐集所有 river 鄰接的 tile id
           const neigh = new Set();
           tileMap.filter(t=>t.type==='river').forEach(r=>{
             r.adjacency.forEach(id=>neigh.add(id));
           });
-          const candidates = [...neigh].map(id=>tileMap.find(t=>t.id===id));
+          // 2) 只留 type !== 'river' 的鄰接格
+          const candidates = [...neigh]
+            .map(id => tileMap.find(t => t.id === id))
+            .filter(t => t.type !== 'river');
+          if (candidates.length === 0) return;  // 沒地方可 flood 就跳過
           const pick = candidates[Math.floor(Math.random()*candidates.length)];
+          // 3) 把它變河流
           pick.type = 'river';
           document.querySelector(`[data-tile-id="${pick.id}"]`)
                   .className = `hex-tile river-tile`;
