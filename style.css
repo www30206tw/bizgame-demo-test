@@ -527,3 +527,58 @@ body {
   color: #e74c3c;    /* 你可以換其他醒目的顏色 */
   font-weight: bold;
 }
+
+/* ─── 新增：開始畫面新手教學 ─── */
+.start-screen .tutorial {
+  background: rgba(255, 255, 255, 0.8);
+  padding: 16px;
+  margin: 16px auto;
+  border-radius: 8px;
+  width: 300px;
+  text-align: left;
+}
+.start-screen .tutorial h2 {
+  margin: 0 0 8px;
+  font-size: 1.2em;
+  text-align: center;
+}
+.start-screen .tutorial-card {
+  position: relative;
+  width: 140px;
+  height: 260px;
+  margin: 0 auto 12px;
+  border: 1px solid #333;
+  background: #eee;
+  padding: 5px;
+  box-sizing: border-box;
+}
+.start-screen .tutorial-card .card-gold-output,
+.start-screen .tutorial-card .card-name,
+.start-screen .tutorial-card .card-rarity,
+.start-screen .tutorial-card .card-label,
+.start-screen .tutorial-card .card-ability,
+.start-screen .tutorial-card .card-type {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+}
+.start-screen .tutorial-card .card-gold-output { top: 5px; font-size: 1.2em; }
+.start-screen .tutorial-card .card-name      { top: 30px; font-weight: bold; }
+.start-screen .tutorial-card .card-rarity    { top: 55px; font-size: 0.9em; }
+.start-screen .tutorial-card .card-label     { top: 75px; font-size: 0.9em; }
+.start-screen .tutorial-card .card-ability   { top: 95px; font-size: 0.8em; color: #060; }
+.start-screen .tutorial-card .card-type      { bottom: 5px; font-size: 0.9em; color: #333; }
+
+.start-screen .tutorial-steps {
+  list-style: disc inside;
+  padding-left: 0;
+  margin: 0;
+  font-size: 0.9em;
+}
+.start-screen .tutorial-steps li {
+  margin: 4px 0;
+}
+.start-screen .tutorial-steps .highlight {
+  font-weight: bold;
+  color: #b33;
+}
