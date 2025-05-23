@@ -1692,7 +1692,7 @@ function updateTechTree() {
     .innerText = currentEvent.name;
   // 換按鈕文字
   document.getElementById('roll-event-btn').innerText = '擲骰';
-  document.getElementById('exchange-points-btn').innerText = '兌換點數';
+  document.getElementById('exchange-points-btn').innerText = '使用金幣提高擲骰點數';
   document.getElementById('event-modal').style.display = 'flex';
 }
 
