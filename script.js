@@ -196,6 +196,7 @@ const cardPoolData = [
   { name:'灣岸輸能站', rarity:'普通', baseProduce:5, label:'河流', specialAbility:'若沒有位於河流，每回合產出-2' ,type:'building' },
   { name:'垂直農倉',   rarity:'稀有', baseProduce:6, label:'貧民窟', specialAbility:'每有 1 座垂直農倉相鄰，產出 +1（最多 +2）' ,type:'building' },
   { name:'通訊樞紐',   rarity:'稀有', baseProduce:6, label:'荒原',   specialAbility:'此建築可同時視為擁有所有地塊 tag，能觸發所有地塊 tag 效果（不改變地塊本身）' ,type:'building' },
+  { name: '荒原觀測塔', rarity: '稀有', baseProduce: 2, label: '荒原', specialAbility: '當發生事件時，使擲骰的點數結果+10', type: 'building' },
   { name:'廢物利用', rarity:'普通', baseProduce:0, specialAbility:'荒原地塊能力的產出額外 +1 金幣', type:'tech' },
   { name:'地價升值', rarity:'稀有', baseProduce:0, specialAbility:'繁華區地塊能力的產出額外 +2 金幣', type:'tech' },
 ];
@@ -1712,21 +1713,32 @@ document.getElementById('exchange-points-btn').onclick = () => {
 
 // 玩家按「抽取」
 document.getElementById('roll-event-btn').onclick = () => {
-  // 先擲一次 1~100，原始值
+   // 1. 先擲一次 1~100，原始值
    const baseRoll  = Math.floor(Math.random() * 100) + 1;
-   // 如果用了兌換，最終點數就是 baseRoll + eventBonus（上限100）
-   const finalRoll = eventBonusUsed
-     ? Math.min(100, baseRoll + eventBonus)
-     : baseRoll;
-   const outcome = currentEvent.outcomes
-     .find(o => finalRoll >= o.range[0] && finalRoll <= o.range[1]);
+   // 2. 計算「觀測塔」數量並給予 +10/座 加成
+   const towerCount = tileMap.filter(t =>
+     t.buildingPlaced && t.buildingName === '荒原觀測塔'
+   ).length;
+   const towerBonus = towerCount * 10;
+   // 3. 如果用了兌換點數，totalBonus = towerBonus + eventBonus
+   const totalBonus = towerBonus + (eventBonusUsed ? eventBonus : 0);
+   // 4. 最終點數（上限 100）
+   const finalRoll = Math.min(100, baseRoll + totalBonus);
+   const outcome = currentEvent.outcomes.find(
+     o => finalRoll >= o.range[0] && finalRoll <= o.range[1]
+   );
   // 先關閉事件選項
   document.getElementById('event-modal').style.display = 'none';
   
   // 顯示結果：94 (84+10) → 效果文字
    let txt = `擲骰：${finalRoll}`;
-   if (eventBonusUsed) {
-     txt += ` (${baseRoll}+${eventBonus})`;
+   // 如果有塔或兌換加成，就在括號裡拆分出來
+   if (towerBonus || eventBonusUsed) {
+     const parts = [];
+     parts.push(`${baseRoll}`);
+     if (towerBonus)    parts.push(`+${towerBonus}`);
+     if (eventBonusUsed) parts.push(`+${eventBonus}`);
+     txt += ` (${parts.join('')})`;
    }
    txt += ` → ${outcome.text}`;
    document.getElementById('event-result-text').innerText = txt;
