@@ -582,3 +582,63 @@ body {
   font-weight: bold;
   color: #b33;
 }
+
+/* 教學文字統一為黑色，除 highlight 之外 */
+.start-screen .tutorial .tutorial-steps li {
+  color: #000;
+}
+
+/* 讓 tutorial 容器可以放絕對定位的註解 */
+.start-screen .tutorial {
+  position: relative;
+}
+
+/* 包住所有箭頭標籤 */
+.start-screen .tutorial .tutorial-annotations {
+  position: absolute;
+  /* 參考 .tutorial-card 的顯示位置微調 */
+  top: 56px;
+  left: calc(50% - 70px);
+  width: 140px;
+  height: 260px;
+}
+
+/* 各註解通用樣式 */
+.start-screen .tutorial .annotation {
+  position: absolute;
+  color: #000;
+  font-size: 0.9em;
+  white-space: nowrap;
+}
+
+/* 各註解位置，箭頭 ➔ 已內建字形 */
+.annotation-gold-output {
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.annotation-card-name {
+  top: 80px;
+  left: 100%;
+  margin-left: 6px;
+}
+.annotation-card-rarity {
+  top: 105px;
+  left: 100%;
+  margin-left: 6px;
+}
+.annotation-card-label {
+  top: 130px;
+  left: 100%;
+  margin-left: 6px;
+}
+.annotation-card-ability {
+  top: 160px;
+  left: 100%;
+  margin-left: 6px;
+}
+.annotation-card-type {
+  top: 280px;
+  left: 50%;
+  transform: translateX(-50%);
+}
