@@ -654,37 +654,76 @@ body {
   color: #000 !important;
 }
 
-/* ─── 新增：左右並排的卡牌＋註解容器 ─── */
-.start-screen .tutorial .tutorial-cards {
-  position: relative;
+/* ------------ 新手教学：示例卡片左右并排 ------------ */
+.tutorial-cards {
   display: flex;
-  align-items: center;
   justify-content: center;
-  gap: 40px; /* 兩張卡中間的間距，可自行微調 */
+  gap: 40px;               /* 两张卡之间的间距 */
+  position: relative;       /* 箭头绝对定位的参考容器 */
+  margin: 0 auto 20px;      /* 居中并留点底部空间 */
 }
 
-/* ─── 新增：中央註解區 ─── */
-.start-screen .tutorial .tutorial-annotations {
-  position: absolute;
-  width: 200px;     /* 註解區寬度，可微調 */
-  height: 260px;    /* 與卡牌高度一致 */
-  top: 0;           /* 與父容器對齊 */
-  left: 50%;
-  transform: translateX(-50%);
+/* 卡牌示意的统一样式 */
+.tutorial-card {
+  width: 140px;
+  height: 260px;
+  border: 1px solid #333;
+  background: #eee;
+  position: relative;       /* 箭头定位相对它 */
 }
 
-/* ─── 新增：箭頭註解文字樣式 ─── */
-.start-screen .tutorial .annotation {
+/* ------------ 箭头通用样式 ------------ */
+.tutorial-arrow {
   position: absolute;
-  color: #000;      /* 黑色 */
   font-size: 14px;
+  color: #000;
   white-space: nowrap;
 }
 
-/* ─── 新增：各欄位箭頭具體位置 ─── */
-.start-screen .annotation-gold-output  { top:  -20px; left: 50%; transform: translateX(-50%); }
-.start-screen .annotation-card-name    { top:   90px; left:100%; margin-left:8px; }
-.start-screen .annotation-card-rarity  { top:  115px; left:100%; margin-left:8px; }
-.start-screen .annotation-card-label   { top:  140px; left:100%; margin-left:8px; }
-.start-screen .annotation-card-ability { top:  170px; left:100%; margin-left:8px; }
-.start-screen .annotation-card-type    { top:  285px; left: 50%; transform: translateX(-50%); }
+/* --- 金币产出箭头 --- */
+.arrow-output {
+  top: 20px;                /* 调整到卡牌上方数字那一行的垂直位置 */
+  left: calc(50% - 200px);  /* 从容器中点左移，让箭头左尖指建筑卡、右尖指科技卡 */
+  width: 400px;             /* 箭头水平长度，保证尖端都在卡片里 */
+  text-align: center;       /* 文字居中 */
+}
+
+/* --- 卡牌名称箭头 --- */
+.arrow-name {
+  top: 80px;                /* 调整到“摩天坊”所在的行 */
+  left: calc(50% - 200px);
+  width: 400px;
+  text-align: center;
+}
+
+/* --- 稀有度箭头 --- */
+.arrow-rarity {
+  top: 110px;               /* “普通”这一行 */
+  left: calc(50% - 200px);
+  width: 400px;
+  text-align: center;
+}
+
+/* --- 地块标签箭头 --- */
+.arrow-label {
+  top: 140px;               /* “繁华区”那行 */
+  left: calc(50% - 200px);
+  width: 400px;
+  text-align: center;
+}
+
+/* --- 能力箭头 --- */
+.arrow-ability {
+  top: 170px;               /* 能力文字那行 */
+  left: calc(50% - 200px);
+  width: 400px;
+  text-align: center;
+}
+
+/* --- 卡牌属性（建筑/科技）箭头 --- */
+.arrow-type {
+  top: 230px;               /* 卡牌底部“建筑”或“科技” */
+  left: calc(50% - 200px);
+  width: 400px;
+  text-align: center;
+}
