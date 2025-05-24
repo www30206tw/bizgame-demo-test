@@ -642,3 +642,15 @@ body {
   left: 50%;
   transform: translateX(-50%);
 }
+
+/* ─── 新手教學文字全改黑 ─── */
+.start-screen .tutorial,
+.start-screen .tutorial *,
+.start-screen .tutorial-card .card-gold-output,
+.start-screen .tutorial-card .card-name,
+.start-screen .tutorial-card .card-rarity,
+.start-screen .tutorial-card .card-label,
+.start-screen .tutorial-card .card-ability,
+.start-screen .tutorial-card .card-type {
+  color: #000 !important;
+}
