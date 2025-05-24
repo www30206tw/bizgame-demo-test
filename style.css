@@ -650,7 +650,6 @@ body {
 .start-screen .tutorial-card .card-name,
 .start-screen .tutorial-card .card-rarity,
 .start-screen .tutorial-card .card-label,
-.start-screen .tutorial-card .card-ability,
 .start-screen .tutorial-card .card-type {
   color: #000 !important;
 }
