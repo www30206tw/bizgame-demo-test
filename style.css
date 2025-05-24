@@ -588,6 +588,25 @@ body {
   color: #000;
 }
 
+
+/* —— 新增：教學示意大框 —— */
+.tutorial-demo {
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 600px;  /* 視情況調整 */
+}
+
+/* 教學範例左右卡片間距拉大 */
+.tutorial-demo .tutorial-cards {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 80px;   /* 由 40px 改為 80px */
+}
+
 /* 讓 tutorial 容器可以放絕對定位的註解 */
 .start-screen .tutorial {
   position: relative;
