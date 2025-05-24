@@ -654,3 +654,40 @@ body {
 .start-screen .tutorial-card .card-type {
   color: #000 !important;
 }
+
+/* ─── 2. 調整箭頭位置 ─── */
+/* 先確保註解容器定位 */
+.start-screen .tutorial .tutorial-annotations {
+  position: absolute;
+  /* 這裡設定第一張（建築卡）容器中心點 */
+  top: calc(50% - 130px);
+  left: calc(50% - 170px);
+  width: 140px;
+  height: 260px;
+}
+
+/* 複製一份給第二張（科技卡）用，右移一個卡寬＋間距 */
+.start-screen .tutorial .tutorial-annotations.tech {
+  position: absolute;
+  top: calc(50% - 130px);
+  left: calc(50% + 30px);
+  width: 140px;
+  height: 260px;
+}
+
+/* 所有箭頭標籤都用絕對定位 */
+.start-screen .tutorial .tutorial-annotations .annotation,
+.start-screen .tutorial .tutorial-annotations.tech .annotation {
+  position: absolute;
+  color: #000;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+/* 各欄位箭頭具體位置（同時適用於建築卡和科技卡容器） */
+.annotation-gold-output  { top:  -20px; left: 50%; transform: translateX(-50%); }
+.annotation-card-name    { top:   90px; left:100%; margin-left:8px; }
+.annotation-card-rarity  { top:  115px; left:100%; margin-left:8px; }
+.annotation-card-label   { top:  140px; left:100%; margin-left:8px; }
+.annotation-card-ability { top:  170px; left:100%; margin-left:8px; }
+.annotation-card-type    { top:  285px; left: 50%; transform: translateX(-50%); }
