@@ -13,46 +13,41 @@
       <p>按下 Enter 或點擊下方按鈕開始遊戲</p>
       <p>請堅持到支付4次金幣</p>
       <!-- 新增：新手教學示意區 -->
-    <div class="tutorial">
-      <h2>新手教學示意</h2>
-      <!-- 左右並排的卡牌＋註解區 -->
-      <div class="tutorial-card">
-        <div class="tutorial-card building-example">
-        <div class="card-gold-output">5</div>
-        <div class="card-image-area"></div>
-        <div class="card-name">摩天坊</div>
-        <div class="card-rarity">普通</div>
-        <div class="card-label">繁華區</div>
-        <div class="card-ability">蓋在繁華區時+4</div>
-        <div class="card-type">建築</div>
-      </div>
-       <div class="tutorial-card tech-example">
-       <div class="card-gold-output"></div>
-       <div class="card-image-area"></div>
-       <div class="card-name">廢物利用</div>
-       <div class="card-rarity">普通</div>
-       <div class="card-label"></div>
-       <div class="card-ability">荒原地塊+1/級</div>
-       <div class="card-type">科技</div>
-     </div>
-      <!-- 新增：箭頭註解 -->
-        <div class="tutorial-arrow arrow-output">→ 金幣產出 ←</div>
-       <div class="tutorial-arrow arrow-name">→ 卡牌名稱 ←</div>
-       <div class="tutorial-arrow arrow-rarity">→ 卡牌稀有度 ←</div>
-       <div class="tutorial-arrow arrow-label">→ 地塊標籤 ←</div>
-       <div class="tutorial-arrow arrow-ability">→ 卡牌能力 ←</div>
-       <div class="tutorial-arrow arrow-type">→ 卡牌属性 ←</div>
-     </div>
-      
-      <!-- 简要说明 -->
-      <ul class="tutorial-steps">
-        <li>1. 抽卡階段：從顯示的 5 張卡中選 2 張</li>
-        <li>2. 拖放卡牌到地圖上的六邊形，放置建築</li>
-        <li>3. 特定回合結束時，右上角收取本回合<span class="highlight">回合收益</span></li>
-      </ul>
+    <div class="tutorial-demo">
+  <div class="tutorial-cards">
+    <!-- 左邊：建築卡示例 -->
+    <div class="tutorial-card example-building">
+      <div class="card-gold-output">5</div>
+      <div class="card-image-area"></div>
+      <div class="card-name">摩天坊</div>
+      <div class="card-rarity">普通</div>
+      <div class="card-label">繁華區</div>
+      <div class="card-ability">蓋在繁華區時 +4</div>
+      <div class="card-type">建築</div>
     </div>
-      <button id="startBtn" type="button">開始遊戲</button>
+
+    <!-- 中間：所有箭頭＋文字說明 -->
+    <div class="tutorial-arrows">
+      <div class="arrow-output">→ 金幣產出 ←</div>
+      <div class="arrow-name">→ 卡牌名稱 ←</div>
+      <div class="arrow-rarity">→ 卡牌稀有度 ←</div>
+      <div class="arrow-label">→ 地塊標籤 ←</div>
+      <div class="arrow-ability">→ 建築能力 ←</div>
+      <div class="arrow-type">→ 卡牌屬性 ←</div>
     </div>
+
+    <!-- 右邊：科技卡示例 -->
+    <div class="tutorial-card example-tech">
+      <div class="card-gold-output">0</div>
+      <div class="card-image-area"></div>
+      <div class="card-name">廢物利用</div>
+      <div class="card-rarity">普通</div>
+      <div class="card-label">荒原</div>
+      <div class="card-ability">荒原地塊 +1/級</div>
+      <div class="card-type">科技</div>
+    </div>
+  </div>
+</div>
 
     <!-- 頂部資訊 -->
     <div class="top-bar">
