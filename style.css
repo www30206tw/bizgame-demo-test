@@ -654,76 +654,40 @@ body {
   color: #000 !important;
 }
 
-/* ------------ 新手教学：示例卡片左右并排 ------------ */
-.tutorial-cards {
+/* 教學範例整體容器：左右並排，箭頭都放中間 */
+.tutorial-demo .tutorial-cards {
+  position: relative;
   display: flex;
   justify-content: center;
-  gap: 40px;               /* 两张卡之间的间距 */
-  position: relative;       /* 箭头绝对定位的参考容器 */
-  margin: 0 auto 20px;      /* 居中并留点底部空间 */
+  align-items: center;
+  gap: 40px;              /* 左右卡片間距 */
 }
 
-/* 卡牌示意的统一样式 */
-.tutorial-card {
-  width: 140px;
-  height: 260px;
-  border: 1px solid #333;
-  background: #eee;
-  position: relative;       /* 箭头定位相对它 */
+/* 範例卡片 */
+.tutorial-demo .tutorial-cards .tutorial-card {
+  flex: none;
+  position: relative;
 }
 
-/* ------------ 箭头通用样式 ------------ */
-.tutorial-arrow {
+/* 箭頭與文字說明的外殼，絕對定位於 tutorial-cards 內 */
+.tutorial-demo .tutorial-arrows {
   position: absolute;
-  font-size: 14px;
-  color: #000;
-  white-space: nowrap;
+  top: 0; bottom: 0;
+  left: 0; right: 0;
+  pointer-events: none;
 }
-
-/* --- 金币产出箭头 --- */
-.arrow-output {
-  top: 20px;                /* 调整到卡牌上方数字那一行的垂直位置 */
-  left: calc(50% - 200px);  /* 从容器中点左移，让箭头左尖指建筑卡、右尖指科技卡 */
-  width: 400px;             /* 箭头水平长度，保证尖端都在卡片里 */
-  text-align: center;       /* 文字居中 */
-}
-
-/* --- 卡牌名称箭头 --- */
-.arrow-name {
-  top: 80px;                /* 调整到“摩天坊”所在的行 */
-  left: calc(50% - 200px);
-  width: 400px;
+.tutorial-demo .tutorial-arrows div {
+  position: absolute;
+  width: 100%;
   text-align: center;
+  color: black;          /* 黑色文字 */
+  font-weight: bold;
 }
 
-/* --- 稀有度箭头 --- */
-.arrow-rarity {
-  top: 110px;               /* “普通”这一行 */
-  left: calc(50% - 200px);
-  width: 400px;
-  text-align: center;
-}
-
-/* --- 地块标签箭头 --- */
-.arrow-label {
-  top: 140px;               /* “繁华区”那行 */
-  left: calc(50% - 200px);
-  width: 400px;
-  text-align: center;
-}
-
-/* --- 能力箭头 --- */
-.arrow-ability {
-  top: 170px;               /* 能力文字那行 */
-  left: calc(50% - 200px);
-  width: 400px;
-  text-align: center;
-}
-
-/* --- 卡牌属性（建筑/科技）箭头 --- */
-.arrow-type {
-  top: 230px;               /* 卡牌底部“建筑”或“科技” */
-  left: calc(50% - 200px);
-  width: 400px;
-  text-align: center;
-}
+/* 各箭頭文字的 Y 座標 */
+.tutorial-demo .arrow-output  { top:  20px; }
+.tutorial-demo .arrow-name    { top:  60px; }
+.tutorial-demo .arrow-rarity  { top: 100px; }
+.tutorial-demo .arrow-label   { top: 140px; }
+.tutorial-demo .arrow-ability { top: 180px; }
+.tutorial-demo .arrow-type    { top: 220px; }
