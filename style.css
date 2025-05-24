@@ -591,7 +591,7 @@ body {
 
 /* —— 新增：教學示意大框 —— */
 .tutorial-demo {
-  background: rgba(255, 255, 255, 0.95);
+  background: #fff;
   border: 2px solid #ccc;
   border-radius: 8px;
   padding: 20px;
@@ -688,18 +688,22 @@ body {
   position: relative;
 }
 
-/* 箭頭與文字說明的外殼，絕對定位於 tutorial-cards 內 */
+/* ── 把箭頭容器鎖定在兩張卡片中間 ── */
+.tutorial-demo .tutorial-cards { position: relative; }
 .tutorial-demo .tutorial-arrows {
   position: absolute;
   top: 0; bottom: 0;
-  left: 0; right: 0;
+  left: 50%;        /* 兩張卡寬度中心 */
+  transform: translateX(-50%);
+  width: 1px;       /* 線本身寬度不重要，箭頭文字靠 left+translateX 置中 */
   pointer-events: none;
 }
 .tutorial-demo .tutorial-arrows div {
   position: absolute;
-  width: 100%;
-  text-align: center;
-  color: black;          /* 黑色文字 */
+  left: 50%;        /* 文字置中 */
+  transform: translateX(-50%);
+  white-space: nowrap;
+  color: #000;
   font-weight: bold;
 }
 
@@ -764,4 +768,10 @@ body {
 .start-screen .tutorial-steps .highlight {
   font-weight: bold;
   color: #b33;
+}
+
+.tutorial-demo .tutorial-steps {
+  color: #000;           /* 黑色文字 */
+  opacity: 1 !important; /* 確保不被半透明覆蓋 */
+  margin-top: 16px;
 }
